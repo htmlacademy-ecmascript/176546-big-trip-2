@@ -18,6 +18,6 @@ export default class EventListView {
   }
 
   removeElement() {
-    this.elment = null;
+    this.element = null;
   }
 }

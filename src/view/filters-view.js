@@ -42,6 +42,6 @@ export default class FiltersView {
   }
 
   removeElement() {
-    this.elment = null;
+    this.element = null;
   }
 }

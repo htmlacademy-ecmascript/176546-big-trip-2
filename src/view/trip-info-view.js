@@ -30,6 +30,6 @@ export default class TripInfoView {
   }
 
   removeElement() {
-    this.elment = null;
+    this.element = null;
   }
 }

@@ -56,6 +56,6 @@ export default class EventView {
   }
 
   removeElement() {
-    this.elment = null;
+    this.element = null;
   }
 }
