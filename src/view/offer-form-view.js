@@ -1,7 +1,7 @@
 import { createElement } from '../render.js';
 
 function createOfferFormTemplate(offer, isChecked = false) {
-  const id = `event-offer-${offer.id}`;
+  const id = `event-offer-${offer}`;
 
   return (
     `<div class="event__offer-selector">

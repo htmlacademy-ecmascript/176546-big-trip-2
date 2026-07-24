@@ -1,15 +1,15 @@
 import { createElement } from '../render.js';
 
 function createDestinationFormTemplate(destinationData) {
-  const { description, photos = [] } = destinationData || {};
+  const { description, pictures = [] } = destinationData || {};
 
-  if (!description && photos.length === 0) {
+  if (!description && pictures.length === 0) {
     return '';
   }
 
-  const photosHtml = photos.length > 0
-    ? photos.map((photo) => `
-      <img class="event__photo" src="${photo}" alt="Event photo">
+  const photosHtml = pictures.length > 0
+    ? pictures.map((picture) => `
+      <img class="event__photo" src="${picture.src}" alt=${picture.description}>
     `).join('')
     : '';
 

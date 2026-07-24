@@ -12,7 +12,13 @@ function createTripInfoTemplate(events) {
   }
 
   const destinations = events
-    .map((event) => event.destination)
+    .map((event) => {
+      if (event.destination && event.destination.destination) {
+        return event.destination.destination;
+      }
+
+      return null;
+    })
     .filter((destination) => destination && destination.length > 0);
 
   const uniqueDestinations = [...new Set(destinations)];

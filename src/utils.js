@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import {OFFERS} from "./const";
 
 dayjs.extend(duration);
 
@@ -24,12 +25,12 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateRandomText(descriptions, shouldBeEmpty = true) {
+function generateRandomText(descriptions, shouldBeEmpty = true, length = 5) {
   if (shouldBeEmpty && Math.random() < 0.3) {
     return '';
   }
 
-  return Array.from({ length: 5 }, () => getRandomArrayElement(descriptions)).join(' ');
+  return Array.from({ length: length }, () => getRandomArrayElement(descriptions)).join(' ');
 }
 
 function generateRandomImages(link, count = 5) {
@@ -73,6 +74,10 @@ function formatDateDiff(date1, date2) {
   return result.trim();
 }
 
+function getRandomBoolean(probability = 0.5) {
+  return Math.random() < probability;
+}
+
 export {
   getRandomArrayElement,
   generateTwoDates,
@@ -81,5 +86,6 @@ export {
   generateRandomImages,
   humanizeEventDueDate,
   formatDate,
-  formatDateDiff
+  formatDateDiff,
+  getRandomBoolean,
 };

@@ -1,4 +1,5 @@
 import { createElement } from '../render.js';
+import {getOfferById} from './offers-view.js';
 
 function createTripCostTemplate(events) {
   if (!events || events.length === 0) {
@@ -12,8 +13,13 @@ function createTripCostTemplate(events) {
   const totalCost = events.reduce((sum, event) => {
     let eventTotal = event.price || 0;
 
-    if (event.offers && event.offers.length > 0) {
-      eventTotal += event.offers.reduce((offerSum, offer) => offerSum + (offer.price || 0), 0);
+    if (event.offers && Array.isArray(event.offers) && event.offers.length > 0) {
+      const offersTotal = event.offers.reduce((offerSum, offerId) => {
+        const offer = getOfferById(offerId);
+        return offerSum + (offer ? offer.price : 0);
+      }, 0);
+
+      eventTotal += offersTotal;
     }
 
     return sum + eventTotal;
