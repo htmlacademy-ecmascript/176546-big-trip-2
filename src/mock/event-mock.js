@@ -2,7 +2,7 @@ import {TYPE, MIN_PRICE, MAX_PRICE, YEAR, OFFERS} from '../const.js';
 import {getRandomArrayElement, generateTwoDates, getRandomNumber, getRandomBoolean} from '../utils.js';
 import {createRandomDestination} from './destination-mock.js';
 
-function createRandomEvent() {
+const createRandomEvent = () => {
   const type = getRandomArrayElement(TYPE);
   const id = `${type}-${getRandomNumber(0, 20)}`;
   const { dateStart, dateEnd } = generateTwoDates(YEAR);
@@ -25,6 +25,6 @@ function createRandomEvent() {
     price: getRandomNumber(MIN_PRICE, MAX_PRICE),
     offers: eventOffers,
   };
-}
+};
 
 export {createRandomEvent};

@@ -16,7 +16,7 @@ function createTripHeaderTemplate(events) {
 
 export default class TripHeaderView {
   constructor({ events = [] } = {}) {
-    this.events = events;
+    this.events = events.sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
   }
 
   getTemplate() {

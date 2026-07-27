@@ -3,7 +3,7 @@ import { createElement } from '../render.js';
 function createDestinationFormTemplate(destinationData) {
   const { description, pictures = [] } = destinationData || {};
 
-  if (!description && pictures.length === 0) {
+  if (!description) {
     return '';
   }
 

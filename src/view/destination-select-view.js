@@ -17,11 +17,12 @@ function createDestinationSelectTemplate(destinationName, eventType) {
         ${eventType}
       </label>
       <input class="event__input  event__input--destination"
-             id="event-destination-1"
-             type="text"
-             name="event-destination"
-             value="${destinationName.destination}"
-             list="destination-list-1">
+       id="event-destination-1"
+       type="text"
+       name="event-destination"
+       value="${destinationName.destination}"
+       list="destination-list-1"
+     >
       <datalist id="destination-list-1">
         ${destinationsTemplate}
       </datalist>
