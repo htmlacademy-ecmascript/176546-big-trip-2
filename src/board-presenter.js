@@ -21,21 +21,7 @@ export default class BoardPresenter {
 
     this.#boardEvents = this.#boardEvents.map((event) => ({...event}));
 
-    render(new SortView(), this.#boardContainer);
-    render(this.#eventListComponent, this.#boardContainer);
-
-    this.renderEvents();
-  }
-
-  renderEvents() {
-
-    if (this.#boardEvents.length === 0) {
-      return;
-    }
-
-    for (let i = 0; i < this.#boardEvents.length; i++) {
-      this.#renderEvent(this.#boardEvents[i], this.#boardEvents[i].offers);
-    }
+    this.#renderBoard();
   }
 
   #renderEvent(event, offers) {
@@ -80,4 +66,17 @@ export default class BoardPresenter {
 
     render(eventComponent, container);
   }
+
+  #renderBoard = () => {
+    render(new SortView(), this.#boardContainer);
+    render(this.#eventListComponent, this.#boardContainer);
+
+    if (this.#boardEvents.length === 0) {
+      return;
+    }
+
+    for (let i = 0; i < this.#boardEvents.length; i++) {
+      this.#renderEvent(this.#boardEvents[i], this.#boardEvents[i].offers);
+    }
+  };
 }
