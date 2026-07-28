@@ -9,13 +9,13 @@ const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
 function createEventFormTemplate(event) {
   const destinationSelectView = new DestinationSelectView({
-    destination: event.destination || '',
+    destination: event.destination,
     eventType: event.type
   }).template;
 
   const destinationData = {
-    description: event.destination?.description || '',
-    pictures: event.destination?.pictures || []
+    description: event.destination?.description,
+    pictures: event.destination?.pictures
   };
 
   const destinationInfoView = new DestinationFormView({
@@ -23,7 +23,7 @@ function createEventFormTemplate(event) {
   }).template;
 
   const offersView = new OffersFormView({
-    offerIds: event.offers || [],
+    offerIds: event.offers,
     eventType: event.type
   }).template;
 
