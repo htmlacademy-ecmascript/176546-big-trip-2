@@ -4,6 +4,7 @@ import {render, RenderPosition} from './framework/render.js';
 import EventsModel from './model/event-model.js';
 import DestinationModel from './model/destination-model.js';
 import TripHeaderView from './view/trip-header-view.js';
+import { OFFERS } from './const.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
@@ -15,7 +16,8 @@ const destinationModel = new DestinationModel();
 const boardPresenter = new BoardPresenter({
   boardContainer: tripEvents,
   eventsModel,
-  destinationModel
+  destinationModel,
+  offers: OFFERS
 });
 
 const events = eventsModel.events;

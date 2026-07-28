@@ -1,31 +1,17 @@
 import OfferFormView from './offer-form-view.js';
-import { OFFERS } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-function getFullOffers(offerIds, eventType) {
-  if (!offerIds || offerIds.length === 0) {
-    return [];
-  }
-
-  const offerType = OFFERS.find((item) => item.type === eventType);
-  if (!offerType) {
-    return [];
-  }
-
-  return offerType.offers;
-}
-
-function createOffersTemplate(offers, checkedOfferIds) {
+function createOffersTemplate(offers, offerIds) {
   if (!offers || offers.length === 0) {
     return '';
   }
 
   return offers.map((offer) => {
-    const isChecked = checkedOfferIds.includes(offer.id);
+    const isChecked = offerIds ? offerIds.includes(offer.id) : false;
 
     const offerView = new OfferFormView({
       offer,
-      isChecked: isChecked
+      isChecked
     });
     return offerView.template;
   }).join('');
@@ -49,17 +35,16 @@ function createOffersSectionTemplate(offers, offerIds) {
 }
 
 export default class OffersFormView extends AbstractView {
+  #offers = null;
   #offerIds = null;
-  #eventType = null;
 
-  constructor({offerIds, eventType}) {
+  constructor({ offers, offerIds }) {
     super();
+    this.#offers = offers;
     this.#offerIds = offerIds;
-    this.#eventType = eventType;
   }
 
   get template() {
-    const fullOffers = getFullOffers(this.#offerIds, this.#eventType);
-    return createOffersSectionTemplate(fullOffers, this.#offerIds);
+    return createOffersSectionTemplate(this.#offers, this.#offerIds);
   }
 }

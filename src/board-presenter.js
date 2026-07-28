@@ -9,11 +9,15 @@ export default class BoardPresenter {
   #eventListComponent = new EventListView();
   #boardContainer = null;
   #eventsModel = null;
+  #destinationModel = null;
+  #offers = null;
   #boardEvents = null;
 
-  constructor({boardContainer, eventsModel}) {
+  constructor({boardContainer, eventsModel, destinationModel, offers}) {
     this.#boardContainer = boardContainer;
     this.#eventsModel = eventsModel;
+    this.#destinationModel = destinationModel;
+    this.#offers = offers;
   }
 
   init() {
@@ -45,6 +49,7 @@ export default class BoardPresenter {
 
     const eventEditComponent = new EventFormView({
       event,
+      offers: this.#offers,
       onSubmit: () => {
         replaceFormToEvent();
         document.removeEventListener('keydown', escKeyDownHandler);
