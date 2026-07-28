@@ -7,10 +7,13 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
-function createEventFormTemplate(event, allOffers) {
+function createEventFormTemplate(event, allOffers, allDestinations) {
+  const destinationName = event.destination?.destination || event.destination?.name || '';
+
   const destinationSelectView = new DestinationSelectView({
-    destination: event.destination,
-    eventType: event.type
+    destination: destinationName,
+    eventType: event.type,
+    allDestinations: allDestinations
   }).template;
 
   const destinationData = {
@@ -87,13 +90,15 @@ function createEventFormTemplate(event, allOffers) {
 export default class EventFormView extends AbstractView {
   #event = null;
   #allOffers = null;
+  #allDestinations = null;
   #handleFormSubmit = null;
   #handlerFormClick = null;
 
-  constructor({event, offers, onSubmit, onClick}) {
+  constructor({event, offers, destinations, onSubmit, onClick}) {
     super();
     this.#event = event;
     this.#allOffers = offers;
+    this.#allDestinations = destinations;
     this.#handleFormSubmit = onSubmit;
     this.#handlerFormClick = onClick;
 
@@ -105,7 +110,10 @@ export default class EventFormView extends AbstractView {
   }
 
   get template() {
-    return createEventFormTemplate(this.#event, this.#allOffers);
+    return createEventFormTemplate(
+      this.#event,
+      this.#allOffers,
+      this.#allDestinations);
   }
 
   #formSaveHandler = (evt) => {

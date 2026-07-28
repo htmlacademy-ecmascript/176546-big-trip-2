@@ -21,9 +21,9 @@ const EVENTS = [
     'base_price': 1100,
     'date_from': '2019-07-10T22:55:56.845Z',
     'date_to': '2019-07-11T11:22:13.375Z',
-    'destination': 'Amsterdam',
+    'destination': 'destination-5',
     'is_favorite': false,
-    'offers': ['offer-1', 'offer-2', 'offer-3'], // Taxi offers
+    'offers': ['offer-1', 'offer-2', 'offer-3'],
     'type': 'taxi'
   },
   {
@@ -31,9 +31,9 @@ const EVENTS = [
     'base_price': 850,
     'date_from': '2023-05-15T08:30:00.000Z',
     'date_to': '2023-05-15T14:45:00.000Z',
-    'destination': 'Chamonix',
+    'destination': 'destination-12',
     'is_favorite': true,
-    'offers': ['offer-4', 'offer-5'], // Bus offers
+    'offers': ['offer-4', 'offer-5'],
     'type': 'bus'
   },
   {
@@ -41,9 +41,9 @@ const EVENTS = [
     'base_price': 2450,
     'date_from': '2023-06-20T06:15:00.000Z',
     'date_to': '2023-06-20T18:30:00.000Z',
-    'destination': 'Geneva',
+    'destination': 'destination-3',
     'is_favorite': false,
-    'offers': ['offer-6', 'offer-7', 'offer-8'], // Train offers
+    'offers': ['offer-6', 'offer-7', 'offer-8'],
     'type': 'train'
   },
   {
@@ -51,9 +51,9 @@ const EVENTS = [
     'base_price': 3200,
     'date_from': '2023-07-01T09:00:00.000Z',
     'date_to': '2023-07-05T20:00:00.000Z',
-    'destination': 'Moscow',
+    'destination': 'destination-18',
     'is_favorite': true,
-    'offers': ['offer-9', 'offer-10'], // Drive offers
+    'offers': ['offer-9', 'offer-10'],
     'type': 'drive'
   },
   {
@@ -61,9 +61,9 @@ const EVENTS = [
     'base_price': 5600,
     'date_from': '2023-08-10T10:30:00.000Z',
     'date_to': '2023-08-12T16:15:00.000Z',
-    'destination': 'Singapore',
+    'destination': 'destination-7',
     'is_favorite': false,
-    'offers': ['offer-11', 'offer-12', 'offer-13'], // Ship offers
+    'offers': ['offer-11', 'offer-12', 'offer-13'],
     'type': 'ship'
   },
   {
@@ -71,9 +71,9 @@ const EVENTS = [
     'base_price': 7800,
     'date_from': '2023-09-05T03:45:00.000Z',
     'date_to': '2023-09-05T21:30:00.000Z',
-    'destination': 'Amsterdam',
+    'destination': 'destination-14',
     'is_favorite': false,
-    'offers': ['offer-14', 'offer-15', 'offer-16', 'offer-17'], // Flight offers
+    'offers': ['offer-14', 'offer-15', 'offer-16', 'offer-17'],
     'type': 'flight'
   },
   {
@@ -81,9 +81,9 @@ const EVENTS = [
     'base_price': 450,
     'date_from': '2023-10-15T14:00:00.000Z',
     'date_to': '2023-10-16T12:00:00.000Z',
-    'destination': 'Chamonix',
+    'destination': 'destination-9',
     'is_favorite': true,
-    'offers': ['offer-18', 'offer-19', 'offer-20'], // Check-in offers
+    'offers': ['offer-18', 'offer-19', 'offer-20'],
     'type': 'check-in'
   },
   {
@@ -91,9 +91,9 @@ const EVENTS = [
     'base_price': 350,
     'date_from': '2023-11-01T10:00:00.000Z',
     'date_to': '2023-11-01T12:30:00.000Z',
-    'destination': 'Geneva',
+    'destination': 'destination-2',
     'is_favorite': false,
-    'offers': ['offer-21', 'offer-22'], // Sightseeing offers
+    'offers': ['offer-21', 'offer-22'],
     'type': 'sightseeing'
   },
   {
@@ -101,9 +101,9 @@ const EVENTS = [
     'base_price': 680,
     'date_from': '2023-12-20T19:00:00.000Z',
     'date_to': '2023-12-20T22:00:00.000Z',
-    'destination': 'Moscow',
+    'destination': 'destination-20',
     'is_favorite': true,
-    'offers': ['offer-23', 'offer-24', 'offer-25'], // Restaurant offers
+    'offers': ['offer-23', 'offer-24', 'offer-25'],
     'type': 'restaurant'
   },
   {
@@ -111,9 +111,9 @@ const EVENTS = [
     'base_price': 1900,
     'date_from': '2024-01-15T07:30:00.000Z',
     'date_to': '2024-01-15T19:45:00.000Z',
-    'destination': 'Singapore',
+    'destination': 'destination-11',
     'isFavorite': false,
-    'offers': ['offer-1', 'offer-2', 'offer-3'], // Taxi offers
+    'offers': ['offer-1', 'offer-2', 'offer-3'],
     'type': 'taxi'
   }
 ];

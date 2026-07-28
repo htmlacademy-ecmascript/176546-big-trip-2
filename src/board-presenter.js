@@ -12,12 +12,14 @@ export default class BoardPresenter {
   #destinationModel = null;
   #offers = null;
   #boardEvents = null;
+  #destinations = null;
 
-  constructor({boardContainer, eventsModel, destinationModel, offers}) {
+  constructor({boardContainer, eventsModel, destinationModel, offers, destinations}) {
     this.#boardContainer = boardContainer;
     this.#eventsModel = eventsModel;
     this.#destinationModel = destinationModel;
     this.#offers = offers;
+    this.#destinations = destinations;
   }
 
   init() {
@@ -50,6 +52,7 @@ export default class BoardPresenter {
     const eventEditComponent = new EventFormView({
       event,
       offers: this.#offers,
+      destinations: this.#destinations,
       onSubmit: () => {
         replaceFormToEvent();
         document.removeEventListener('keydown', escKeyDownHandler);
