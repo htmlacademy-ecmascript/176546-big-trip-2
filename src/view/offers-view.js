@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
 import OfferView from './offer-view.js';
 import { OFFERS } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function getOfferById(offerId) {
   for (const offerType of OFFERS) {
@@ -27,7 +27,7 @@ function createOffersTemplate(offerIds) {
 
   return offers.map((offer) => {
     const offerView = new OfferView({ offer });
-    return offerView.getTemplate();
+    return offerView.template;
   }).join('');
 }
 
@@ -45,25 +45,16 @@ function createOffersSectionTemplate(offerIds) {
   `;
 }
 
-export default class OffersView {
+export default class OffersView extends AbstractView {
+  #offerIds = null;
+
   constructor({ offerIds = [] }) {
-    this.offerIds = offerIds;
+    super();
+    this.#offerIds = offerIds;
   }
 
-  getTemplate() {
-    return createOffersSectionTemplate(this.offerIds);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createOffersSectionTemplate(this.#offerIds);
   }
 }
 

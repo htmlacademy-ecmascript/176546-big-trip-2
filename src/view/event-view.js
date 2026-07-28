@@ -1,6 +1,6 @@
-import {createElement} from '../render.js';
 import {formatDate, humanizeEventDueDate, formatDateDiff} from '../utils.js';
 import OffersView from './offers-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
@@ -22,7 +22,7 @@ function createEventTemplate(event) {
   const duration = formatDateDiff(timeStart, timeEnd);
 
   const offersView = new OffersView({ offerIds: offers || [] });
-  const offersTemplate = offersView.getTemplate();
+  const offersTemplate = offersView.template;
 
   const favoriteButtonClass = isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -63,25 +63,27 @@ function createEventTemplate(event) {
   );
 }
 
-export default class EventView {
-  constructor({event, offers = []}) {
-    this.event = event;
-    this.offers = offers;
+export default class EventView extends AbstractView {
+  #event = null;
+  #offers = null;
+  #handleRollupClick = null;
+
+  constructor({event, offers = [], onRollupClick}) {
+    super();
+    this.#event = event;
+    this.#offers = offers;
+    this.#handleRollupClick = onRollupClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#clickHandler);
   }
 
-  getTemplate() {
-    return createEventTemplate(this.event);
+  get template() {
+    return createEventTemplate(this.#event);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollupClick();
+  };
 }

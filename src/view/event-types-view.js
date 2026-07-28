@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { TYPE } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEventTypesTemplate(currentType) {
   return TYPE.map((type) => {
@@ -35,24 +35,15 @@ function createEventTypesSectionTemplate(currentType) {
   `;
 }
 
-export default class EventTypesView {
+export default class EventTypesView extends AbstractView {
+  #currentType = null;
+
   constructor({currentType}) {
-    this.currentType = currentType || 'flight';
+    super();
+    this.#currentType = currentType;
   }
 
-  getTemplate() {
-    return createEventTypesSectionTemplate(this.currentType);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventTypesSectionTemplate(this.#currentType);
   }
 }

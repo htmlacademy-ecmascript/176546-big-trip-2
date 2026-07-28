@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
 import TripInfoView from './trip-info-view.js';
 import TripCostView from './trip-cost-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createTripHeaderTemplate(events) {
   const infoView = new TripInfoView({ events });
@@ -8,29 +8,21 @@ function createTripHeaderTemplate(events) {
 
   return `
     <section class="trip-main__trip-info trip-info">
-      ${infoView.getTemplate()}
-      ${costView.getTemplate()}
+      ${infoView.template}
+      ${costView.template}
     </section>
   `;
 }
 
-export default class TripHeaderView {
+export default class TripHeaderView extends AbstractView {
+  #events = null;
+
   constructor({ events = [] } = {}) {
-    this.events = events.sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+    super();
+    this.#events = events.sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
   }
 
-  getTemplate() {
-    return createTripHeaderTemplate(this.events);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createTripHeaderTemplate(this.#events);
   }
 }

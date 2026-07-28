@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import { DESTINATION } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createDestinationsTemplate(currentDestination) {
   return DESTINATION.map((destination) => {
@@ -30,25 +30,17 @@ function createDestinationSelectTemplate(destinationName, eventType) {
   `;
 }
 
-export default class DestinationSelectView {
+export default class DestinationSelectView extends AbstractView {
+  #destination = null;
+  #eventType = null;
+
   constructor({destination, eventType}) {
-    this.destination = destination || '';
-    this.eventType = eventType || '';
+    super();
+    this.#destination = destination || '';
+    this.#eventType = eventType || '';
   }
 
-  getTemplate() {
-    return createDestinationSelectTemplate(this.destination, this.eventType);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createDestinationSelectTemplate(this.#destination, this.#eventType);
   }
 }

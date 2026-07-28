@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createTripInfoTemplate(events) {
   if (!events || events.length === 0) {
@@ -53,24 +53,13 @@ function createTripInfoTemplate(events) {
   `;
 }
 
-export default class TripInfoView {
+export default class TripInfoView extends AbstractView {
   constructor({ events = [] } = {}) {
+    super();
     this.events = events;
   }
 
-  getTemplate() {
+  get template() {
     return createTripInfoTemplate(this.events);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

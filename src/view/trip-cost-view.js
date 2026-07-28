@@ -1,5 +1,5 @@
-import { createElement } from '../render.js';
 import {getOfferById} from './offers-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createTripCostTemplate(events) {
   if (!events || events.length === 0) {
@@ -32,24 +32,15 @@ function createTripCostTemplate(events) {
   `;
 }
 
-export default class TripCostView {
+export default class TripCostView extends AbstractView {
+  #events = null;
+
   constructor({ events = [] } = {}) {
-    this.events = events;
+    super();
+    this.#events = events;
   }
 
-  getTemplate() {
-    return createTripCostTemplate(this.events);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createTripCostTemplate(this.#events);
   }
 }

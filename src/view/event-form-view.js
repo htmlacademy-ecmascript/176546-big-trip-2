@@ -1,9 +1,9 @@
-import { createElement } from '../render.js';
 import OffersFormView from './offers-form-view.js';
 import DestinationFormView from './destination-form-view.js';
 import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
 import {humanizeEventDueDate} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
@@ -11,7 +11,7 @@ function createEventFormTemplate(event) {
   const destinationSelectView = new DestinationSelectView({
     destination: event.destination || '',
     eventType: event.type
-  }).getTemplate();
+  }).template;
 
   const destinationData = {
     description: event.destination?.description || '',
@@ -20,16 +20,16 @@ function createEventFormTemplate(event) {
 
   const destinationInfoView = new DestinationFormView({
     destinationData
-  }).getTemplate();
+  }).template;
 
   const offersView = new OffersFormView({
     offerIds: event.offers || [],
     eventType: event.type
-  }).getTemplate();
+  }).template;
 
   const eventTypesView = new EventTypesView({
     currentType: event.type
-  }).getTemplate();
+  }).template;
 
   const humanizeTimeStart = humanizeEventDueDate(event.dueDateStart, TIME_FORMAT);
   const humanizeTimeEnd = humanizeEventDueDate(event.dueDateEnd, TIME_FORMAT);
@@ -68,6 +68,9 @@ function createEventFormTemplate(event) {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           ${offersView}
@@ -78,24 +81,35 @@ function createEventFormTemplate(event) {
   );
 }
 
-export default class EventFormView {
-  constructor({event = []}) {
-    this.event = event;
+export default class EventFormView extends AbstractView {
+  #event = null;
+  #handleFormSubmit = null;
+  #handlerFormClick = null;
+
+  constructor({event = [], onSubmit, onClick}) {
+    super();
+    this.#event = event;
+    this.#handleFormSubmit = onSubmit;
+    this.#handlerFormClick = onClick;
+
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSaveHandler);
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#formClickHandler);
   }
 
-  getTemplate() {
-    return createEventFormTemplate(this.event);
+  get template() {
+    return createEventFormTemplate(this.#event);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #formSaveHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerFormClick();
+  };
 }

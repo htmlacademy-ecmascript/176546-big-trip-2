@@ -1,6 +1,6 @@
 import FiltersView from './view/filters-view.js';
 import BoardPresenter from './board-presenter.js';
-import {render, RenderPosition} from './render.js';
+import {render, RenderPosition} from './framework/render.js';
 import EventsModel from './model/event-model.js';
 import DestinationModel from './model/destination-model.js';
 import TripHeaderView from './view/trip-header-view.js';
@@ -18,7 +18,7 @@ const boardPresenter = new BoardPresenter({
   destinationModel
 });
 
-const events = eventsModel.getEvents();
+const events = eventsModel.events;
 const tripHeaderView = new TripHeaderView({ events });
 
 render(tripHeaderView, tripMain, RenderPosition.AFTERBEGIN);

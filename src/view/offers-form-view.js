@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
 import OfferFormView from './offer-form-view.js';
 import { OFFERS } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function getFullOffers(offerIds, eventType) {
   if (!offerIds || offerIds.length === 0) {
@@ -25,7 +25,7 @@ function createOffersTemplate(offers) {
       offer,
       isChecked: true
     });
-    return offerView.getTemplate();
+    return offerView.template;
   }).join('');
 }
 
@@ -46,26 +46,18 @@ function createOffersSectionTemplate(offers) {
   `;
 }
 
-export default class OffersFormView {
+export default class OffersFormView extends AbstractView {
+  #offerIds = null;
+  #eventType = null;
+
   constructor({offerIds, eventType}) {
-    this.offerIds = offerIds || [];
-    this.eventType = eventType || '';
+    super();
+    this.#offerIds = offerIds || [];
+    this.#eventType = eventType || '';
   }
 
-  getTemplate() {
-    const fullOffers = getFullOffers(this.offerIds, this.eventType);
+  get template() {
+    const fullOffers = getFullOffers(this.#offerIds, this.#eventType);
     return createOffersSectionTemplate(fullOffers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

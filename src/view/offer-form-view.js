@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createOfferFormTemplate(offer, isChecked = false) {
   const id = `event-offer-${offer}`;
@@ -19,25 +19,17 @@ function createOfferFormTemplate(offer, isChecked = false) {
   );
 }
 
-export default class OfferFormView {
+export default class OfferFormView extends AbstractView {
+  #offer = null;
+  #isChecked = null;
+
   constructor({offer, isChecked = false}) {
-    this.offer = offer;
-    this.isChecked = isChecked;
+    super();
+    this.#offer = offer;
+    this.#isChecked = isChecked;
   }
 
-  getTemplate() {
-    return createOfferFormTemplate(this.offer, this.isChecked);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createOfferFormTemplate(this.#offer, this.#isChecked);
   }
 }
