@@ -33,13 +33,6 @@ export default class BoardPresenter {
       return;
     }
 
-    // const eventFormView = new EventFormView({
-    //   event: this.#boardEvents[0],
-    //   offers: this.#boardEvents[0].offers
-    // });
-    //
-    // render(eventFormView, container);
-
     for (let i = 0; i < this.#boardEvents.length; i++) {
       this.#renderEvent(this.#boardEvents[i], this.#boardEvents[i].offers);
     }
