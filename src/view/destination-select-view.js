@@ -4,6 +4,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 function createDestinationsTemplate(currentDestination) {
   return DESTINATION.map((destination) => {
     const isSelected = destination === currentDestination ? 'selected' : '';
+
     return `<option value="${destination}" ${isSelected}></option>`;
   }).join('');
 }
@@ -36,8 +37,8 @@ export default class DestinationSelectView extends AbstractView {
 
   constructor({destination, eventType}) {
     super();
-    this.#destination = destination || '';
-    this.#eventType = eventType || '';
+    this.#destination = destination;
+    this.#eventType = eventType;
   }
 
   get template() {

@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createDestinationFormTemplate(destinationData) {
-  const { description, pictures = [] } = destinationData || {};
+  const { description, pictures = [] } = destinationData;
 
   if (!description) {
     return '';
@@ -31,7 +31,7 @@ function createDestinationFormTemplate(destinationData) {
 export default class DestinationFormView extends AbstractView {
   #destinationData = null;
 
-  constructor({ destinationData = {} }) {
+  constructor({ destinationData }) {
     super();
     this.#destinationData = destinationData;
   }

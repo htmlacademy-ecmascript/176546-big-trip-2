@@ -67,7 +67,7 @@ function createEventFormTemplate(event) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
@@ -86,7 +86,7 @@ export default class EventFormView extends AbstractView {
   #handleFormSubmit = null;
   #handlerFormClick = null;
 
-  constructor({event = [], onSubmit, onClick}) {
+  constructor({event, onSubmit, onClick}) {
     super();
     this.#event = event;
     this.#handleFormSubmit = onSubmit;

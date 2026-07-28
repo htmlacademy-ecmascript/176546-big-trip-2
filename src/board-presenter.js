@@ -20,8 +20,6 @@ export default class BoardPresenter {
     this.#boardEvents = [...this.#eventsModel.events]
       .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
 
-    this.#boardEvents = this.#boardEvents.map((event) => ({...event}));
-
     this.#renderBoard();
   }
 
@@ -78,7 +76,7 @@ export default class BoardPresenter {
     render(this.#eventListComponent, this.#boardContainer);
 
     for (let i = 0; i < this.#boardEvents.length; i++) {
-      this.#renderEvent(this.#boardEvents[i], this.#boardEvents[i].offers);
+      this.#renderEvent(this.#boardEvents[i]);
     }
   };
 }

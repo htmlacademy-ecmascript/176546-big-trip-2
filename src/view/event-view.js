@@ -65,13 +65,11 @@ function createEventTemplate(event) {
 
 export default class EventView extends AbstractView {
   #event = null;
-  #offers = null;
   #handleRollupClick = null;
 
-  constructor({event, offers = [], onRollupClick}) {
+  constructor({event, onRollupClick}) {
     super();
     this.#event = event;
-    this.#offers = offers;
     this.#handleRollupClick = onRollupClick;
 
     this.element.querySelector('.event__rollup-btn')

@@ -35,7 +35,7 @@ function createTripCostTemplate(events) {
 export default class TripCostView extends AbstractView {
   #events = null;
 
-  constructor({ events = [] } = {}) {
+  constructor({ events }) {
     super();
     this.#events = events;
   }

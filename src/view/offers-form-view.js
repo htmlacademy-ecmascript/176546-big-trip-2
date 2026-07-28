@@ -52,8 +52,8 @@ export default class OffersFormView extends AbstractView {
 
   constructor({offerIds, eventType}) {
     super();
-    this.#offerIds = offerIds || [];
-    this.#eventType = eventType || '';
+    this.#offerIds = offerIds;
+    this.#eventType = eventType;
   }
 
   get template() {

@@ -48,7 +48,7 @@ function createOffersSectionTemplate(offerIds) {
 export default class OffersView extends AbstractView {
   #offerIds = null;
 
-  constructor({ offerIds = [] }) {
+  constructor({ offerIds }) {
     super();
     this.#offerIds = offerIds;
   }

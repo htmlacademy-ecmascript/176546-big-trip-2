@@ -54,7 +54,7 @@ function createTripInfoTemplate(events) {
 }
 
 export default class TripInfoView extends AbstractView {
-  constructor({ events = [] } = {}) {
+  constructor({ events }) {
     super();
     this.events = events;
   }
