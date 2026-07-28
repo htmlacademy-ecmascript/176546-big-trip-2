@@ -12,29 +12,31 @@ function getFullOffers(offerIds, eventType) {
     return [];
   }
 
-  return offerType.offers.filter((offer) => offerIds.includes(offer.id));
+  return offerType.offers;
 }
 
-function createOffersTemplate(offers) {
+function createOffersTemplate(offers, checkedOfferIds) {
   if (!offers || offers.length === 0) {
     return '';
   }
 
   return offers.map((offer) => {
+    const isChecked = checkedOfferIds.includes(offer.id);
+
     const offerView = new OfferFormView({
       offer,
-      isChecked: true
+      isChecked: isChecked
     });
     return offerView.template;
   }).join('');
 }
 
-function createOffersSectionTemplate(offers) {
+function createOffersSectionTemplate(offers, offerIds) {
   if (!offers || offers.length === 0) {
     return '';
   }
 
-  const offersTemplate = createOffersTemplate(offers);
+  const offersTemplate = createOffersTemplate(offers, offerIds);
 
   return `
     <section class="event__section  event__section--offers">
@@ -58,6 +60,6 @@ export default class OffersFormView extends AbstractView {
 
   get template() {
     const fullOffers = getFullOffers(this.#offerIds, this.#eventType);
-    return createOffersSectionTemplate(fullOffers);
+    return createOffersSectionTemplate(fullOffers, this.#offerIds);
   }
 }
