@@ -1,7 +1,7 @@
-import { createElement } from '../render.js';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view.js';
 
-function createTripInfoTemplate(events) {
+function createTripInfoTemplate(events, allDestinations) {
   if (!events || events.length === 0) {
     return `
       <div class="trip-info__main">
@@ -11,18 +11,24 @@ function createTripInfoTemplate(events) {
     `;
   }
 
-  const destinations = events
-    .map((event) => {
-      if (event.destination && event.destination.destination) {
-        return event.destination.destination;
-      }
+  const destinationIds = events.map((event) => event.destination);
+  const destinations = allDestinations.destinations.filter((dest) => destinationIds.includes(dest.id));
 
-      return null;
-    })
-    .filter((destination) => destination && destination.length > 0);
+  const destinationNames = destinationIds.map((id) => {
+    const dest = destinations.find((d) => d.id === id);
+    return dest?.name;
+  });
 
-  const uniqueDestinations = [...new Set(destinations)];
-  const destinationsChain = uniqueDestinations.join(' &mdash; ');
+  let destinationsChain = '';
+  if (destinationNames.length === 0) {
+    destinationsChain = 'No destinations';
+  } else if (destinationNames.length <= 3) {
+    destinationsChain = destinationNames.join(' &mdash; ');
+  } else {
+    const firstCity = destinationNames[0];
+    const lastCity = destinationNames[destinationNames.length - 1];
+    destinationsChain = `${firstCity} &mdash; ... &mdash; ${lastCity}`;
+  }
 
   const dates = events
     .map((event) => event.dueDateStart)
@@ -47,30 +53,23 @@ function createTripInfoTemplate(events) {
 
   return `
     <div class="trip-info__main">
-      <h1 class="trip-info__title">${destinationsChain || 'No destinations'}</h1>
+      <h1 class="trip-info__title">${destinationsChain}</h1>
       ${datesString ? `<p class="trip-info__dates">${datesString}</p>` : ''}
     </div>
   `;
 }
 
-export default class TripInfoView {
-  constructor({ events = [] } = {}) {
-    this.events = events;
+export default class TripInfoView extends AbstractView {
+  #events = null;
+  #allDestinations = null;
+
+  constructor({ events, allDestinations }) {
+    super();
+    this.#events = events;
+    this.#allDestinations = allDestinations;
   }
 
-  getTemplate() {
-    return createTripInfoTemplate(this.events);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createTripInfoTemplate(this.#events, this.#allDestinations);
   }
 }

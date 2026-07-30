@@ -1,35 +1,36 @@
-import { createElement } from '../render.js';
 import OffersFormView from './offers-form-view.js';
 import DestinationFormView from './destination-form-view.js';
 import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
 import {humanizeEventDueDate} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
-function createEventFormTemplate(event) {
-  const destinationSelectView = new DestinationSelectView({
-    destination: event.destination || '',
-    eventType: event.type
-  }).getTemplate();
+function createEventFormTemplate(event, allOffers, allDestinations) {
+  const destinationData = allDestinations.find((dest) => dest.id === event.destination);
 
-  const destinationData = {
-    description: event.destination?.description || '',
-    pictures: event.destination?.pictures || []
-  };
+  const destinationSelectView = new DestinationSelectView({
+    destination: destinationData.name,
+    eventType: event.type,
+    allDestinations: allDestinations
+  }).template;
 
   const destinationInfoView = new DestinationFormView({
     destinationData
-  }).getTemplate();
+  }).template;
+
+  const offerType = allOffers.find((item) => item.type === event.type);
+  const allOffersForType = offerType ? offerType.offers : [];
 
   const offersView = new OffersFormView({
-    offerIds: event.offers || [],
-    eventType: event.type
-  }).getTemplate();
+    offers: allOffersForType,
+    offerIds: event.offers
+  }).template;
 
   const eventTypesView = new EventTypesView({
     currentType: event.type
-  }).getTemplate();
+  }).template;
 
   const humanizeTimeStart = humanizeEventDueDate(event.dueDateStart, TIME_FORMAT);
   const humanizeTimeEnd = humanizeEventDueDate(event.dueDateEnd, TIME_FORMAT);
@@ -41,7 +42,7 @@ function createEventFormTemplate(event) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${event.type}.png" alt="Event type icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
              ${eventTypesView}
@@ -67,7 +68,10 @@ function createEventFormTemplate(event) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           ${offersView}
@@ -78,24 +82,42 @@ function createEventFormTemplate(event) {
   );
 }
 
-export default class EventFormView {
-  constructor({event = []}) {
-    this.event = event;
+export default class EventFormView extends AbstractView {
+  #event = null;
+  #allOffers = null;
+  #allDestinations = null;
+  #handleFormSubmit = null;
+  #handlerFormClick = null;
+
+  constructor({event, offers, destinations, onSubmit, onClick}) {
+    super();
+    this.#event = event;
+    this.#allOffers = offers;
+    this.#allDestinations = destinations;
+    this.#handleFormSubmit = onSubmit;
+    this.#handlerFormClick = onClick;
+
+    this.element.querySelector('form')
+      .addEventListener('submit', this.#formSaveHandler);
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#formClickHandler);
   }
 
-  getTemplate() {
-    return createEventFormTemplate(this.event);
+  get template() {
+    return createEventFormTemplate(
+      this.#event,
+      this.#allOffers,
+      this.#allDestinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #formSaveHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit();
+  };
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #formClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerFormClick();
+  };
 }

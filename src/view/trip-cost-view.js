@@ -1,7 +1,6 @@
-import { createElement } from '../render.js';
-import {getOfferById} from './offers-view.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-function createTripCostTemplate(events) {
+function createTripCostTemplate(events, allOffers) {
   if (!events || events.length === 0) {
     return `
       <p class="trip-info__cost">
@@ -11,12 +10,14 @@ function createTripCostTemplate(events) {
   }
 
   const totalCost = events.reduce((sum, event) => {
-    let eventTotal = event.price || 0;
+    let eventTotal = event.price;
+    const offerByType = allOffers.find((offer) => offer.type === event.type);
 
-    if (event.offers && Array.isArray(event.offers) && event.offers.length > 0) {
-      const offersTotal = event.offers.reduce((offerSum, offerId) => {
-        const offer = getOfferById(offerId);
-        return offerSum + (offer ? offer.price : 0);
+    if (event.offers.length > 0) {
+      const offersTotal = event.offers.reduce((acc, offerId) => {
+        const totalPrice = offerByType.offers.find((offer) => offer.id === offerId).price;
+
+        return acc + totalPrice;
       }, 0);
 
       eventTotal += offersTotal;
@@ -32,24 +33,17 @@ function createTripCostTemplate(events) {
   `;
 }
 
-export default class TripCostView {
-  constructor({ events = [] } = {}) {
-    this.events = events;
+export default class TripCostView extends AbstractView {
+  #events = null;
+  #allOffers = null;
+
+  constructor({ events, allOffers }) {
+    super();
+    this.#events = events;
+    this.#allOffers = allOffers;
   }
 
-  getTemplate() {
-    return createTripCostTemplate(this.events);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createTripCostTemplate(this.#events, this.#allOffers);
   }
 }

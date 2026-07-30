@@ -3,9 +3,13 @@ import {createRandomEvent} from '../mock/event-mock.js';
 const EVENT_COUNT = 4;
 
 export default class EventsModel {
-  events = Array.from({length: EVENT_COUNT}, createRandomEvent);
+  #events = [];
 
-  getEvents() {
-    return this.events;
+  constructor({offers, destinations}) {
+    this.#events = Array.from({length: EVENT_COUNT}, () => createRandomEvent(offers, destinations));
+  }
+
+  get events() {
+    return this.#events;
   }
 }

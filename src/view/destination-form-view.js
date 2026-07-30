@@ -1,9 +1,9 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createDestinationFormTemplate(destinationData) {
-  const { description, pictures = [] } = destinationData || {};
+  const { description, pictures = [] } = destinationData;
 
-  if (!description && pictures.length === 0) {
+  if (!description) {
     return '';
   }
 
@@ -28,24 +28,15 @@ function createDestinationFormTemplate(destinationData) {
   `;
 }
 
-export default class DestinationFormView {
-  constructor({ destinationData = {} }) {
-    this.destinationData = destinationData;
+export default class DestinationFormView extends AbstractView {
+  #destinationData = null;
+
+  constructor({ destinationData }) {
+    super();
+    this.#destinationData = destinationData;
   }
 
-  getTemplate() {
-    return createDestinationFormTemplate(this.destinationData);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createDestinationFormTemplate(this.#destinationData);
   }
 }

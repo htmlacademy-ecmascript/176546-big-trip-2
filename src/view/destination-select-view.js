@@ -1,15 +1,19 @@
-import { createElement } from '../render.js';
-import { DESTINATION } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-function createDestinationsTemplate(currentDestination) {
-  return DESTINATION.map((destination) => {
+function createDestinationsTemplate(allDestinations, currentDestination) {
+  if (!allDestinations || allDestinations.length === 0) {
+    return '';
+  }
+
+  return allDestinations.map((destination) => {
     const isSelected = destination === currentDestination ? 'selected' : '';
-    return `<option value="${destination}" ${isSelected}></option>`;
+
+    return `<option value="${destination.name}" ${isSelected}></option>`;
   }).join('');
 }
 
-function createDestinationSelectTemplate(destinationName, eventType) {
-  const destinationsTemplate = createDestinationsTemplate(destinationName);
+function createDestinationSelectTemplate(destinationName, eventType, allDestinations) {
+  const destinationsTemplate = createDestinationsTemplate(allDestinations, destinationName);
 
   return `
     <div class="event__field-group  event__field-group--destination">
@@ -17,11 +21,12 @@ function createDestinationSelectTemplate(destinationName, eventType) {
         ${eventType}
       </label>
       <input class="event__input  event__input--destination"
-             id="event-destination-1"
-             type="text"
-             name="event-destination"
-             value="${destinationName.destination}"
-             list="destination-list-1">
+       id="event-destination-1"
+       type="text"
+       name="event-destination"
+       value="${destinationName || ''}"
+       list="destination-list-1"
+     >
       <datalist id="destination-list-1">
         ${destinationsTemplate}
       </datalist>
@@ -29,25 +34,23 @@ function createDestinationSelectTemplate(destinationName, eventType) {
   `;
 }
 
-export default class DestinationSelectView {
-  constructor({destination, eventType}) {
-    this.destination = destination || '';
-    this.eventType = eventType || '';
+export default class DestinationSelectView extends AbstractView {
+  #destination = null;
+  #eventType = null;
+  #allDestinations = null;
+
+  constructor({destination, eventType, allDestinations}) {
+    super();
+    this.#destination = destination;
+    this.#eventType = eventType;
+    this.#allDestinations = allDestinations || [];
   }
 
-  getTemplate() {
-    return createDestinationSelectTemplate(this.destination, this.eventType);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createDestinationSelectTemplate(
+      this.#destination,
+      this.#eventType,
+      this.#allDestinations
+    );
   }
 }

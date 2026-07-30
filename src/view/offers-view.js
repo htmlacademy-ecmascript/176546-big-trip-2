@@ -1,38 +1,24 @@
-import { createElement } from '../render.js';
 import OfferView from './offer-view.js';
-import { OFFERS } from '../const.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
-function getOfferById(offerId) {
-  for (const offerType of OFFERS) {
-    const foundOffer = offerType.offers.find((offer) => offer.id === offerId);
-    if (foundOffer) {
-      return foundOffer;
-    }
-  }
-  return null;
-}
-
-function createOffersTemplate(offerIds) {
-  if (!offerIds || offerIds.length === 0) {
+function createOffersTemplate(event, allOffers) {
+  if (event.offers.length === 0) {
     return '';
   }
 
-  const offers = offerIds
-    .map((id) => getOfferById(id))
-    .filter((offer) => offer !== null);
+  const offerByType = allOffers.find((offer) => offer.type === event.type).offers;
 
-  if (offers.length === 0) {
-    return '';
-  }
+  const currentOffers = offerByType.filter((offer) => event.offers.includes(offer.id));
 
-  return offers.map((offer) => {
+
+  return currentOffers.map((offer) => {
     const offerView = new OfferView({ offer });
-    return offerView.getTemplate();
+    return offerView.template;
   }).join('');
 }
 
-function createOffersSectionTemplate(offerIds) {
-  const offersTemplate = createOffersTemplate(offerIds);
+function createOffersSectionTemplate(offerIds, offers) {
+  const offersTemplate = createOffersTemplate(offerIds, offers);
 
   if (!offersTemplate) {
     return '';
@@ -45,26 +31,17 @@ function createOffersSectionTemplate(offerIds) {
   `;
 }
 
-export default class OffersView {
-  constructor({ offerIds = [] }) {
-    this.offerIds = offerIds;
+export default class OffersView extends AbstractView {
+  #event = null;
+  #offers = null;
+
+  constructor({ event, offers }) {
+    super();
+    this.#event = event;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createOffersSectionTemplate(this.offerIds);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createOffersSectionTemplate(this.#event, this.#offers);
   }
 }
-
-export {getOfferById};
