@@ -21,7 +21,7 @@ function createRandomDestination() {
   return {
     id: id,
     description: description,
-    destination: destination,
+    name: destination,
     pictures: pictures,
   };
 }

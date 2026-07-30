@@ -10,26 +10,29 @@ export default class BoardPresenter {
   #boardContainer = null;
   #eventsModel = null;
   #destinationModel = null;
-  #offers = null;
+  #offersModel = null;
   #boardEvents = null;
+  #offers = null;
   #destinations = null;
 
-  constructor({boardContainer, eventsModel, destinationModel, offers, destinations}) {
+  constructor({boardContainer, eventsModel, destinationModel, offersModel}) {
     this.#boardContainer = boardContainer;
     this.#eventsModel = eventsModel;
     this.#destinationModel = destinationModel;
-    this.#offers = offers;
-    this.#destinations = destinations;
+    this.#offersModel = offersModel;
   }
 
   init() {
     this.#boardEvents = [...this.#eventsModel.events]
       .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
 
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+
     this.#renderBoard();
   }
 
-  #renderEvent(event, offers) {
+  #renderEvent(event) {
     const container = this.#eventListComponent.element;
 
     function escKeyDownHandler(evt) {
@@ -42,7 +45,8 @@ export default class BoardPresenter {
 
     const eventComponent = new EventView({
       event,
-      offers,
+      offers: this.#offers,
+      destination: this.#destinationModel.getDestinationById(event.destination),
       onRollupClick: () => {
         replaceCardToForm();
         document.addEventListener('keydown', escKeyDownHandler);

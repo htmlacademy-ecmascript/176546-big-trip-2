@@ -7,7 +7,8 @@ function createDestinationsTemplate(allDestinations, currentDestination) {
 
   return allDestinations.map((destination) => {
     const isSelected = destination === currentDestination ? 'selected' : '';
-    return `<option value="${destination}" ${isSelected}></option>`;
+
+    return `<option value="${destination.name}" ${isSelected}></option>`;
   }).join('');
 }
 

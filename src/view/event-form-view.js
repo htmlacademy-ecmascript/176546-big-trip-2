@@ -8,18 +8,13 @@ import AbstractView from '../framework/view/abstract-view.js';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
 function createEventFormTemplate(event, allOffers, allDestinations) {
-  const destinationName = event.destination?.destination || event.destination?.name || '';
+  const destinationData = allDestinations.find((dest) => dest.id === event.destination);
 
   const destinationSelectView = new DestinationSelectView({
-    destination: destinationName,
+    destination: destinationData.name,
     eventType: event.type,
     allDestinations: allDestinations
   }).template;
-
-  const destinationData = {
-    description: event.destination?.description,
-    pictures: event.destination?.pictures
-  };
 
   const destinationInfoView = new DestinationFormView({
     destinationData

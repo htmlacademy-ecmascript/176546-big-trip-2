@@ -1,15 +1,14 @@
-import {TYPE, MIN_PRICE, MAX_PRICE, YEAR, OFFERS} from '../const.js';
+import {TYPE, MIN_PRICE, MAX_PRICE, YEAR} from '../const.js';
 import {getRandomArrayElement, generateTwoDates, getRandomNumber, getRandomBoolean} from '../utils.js';
-import {createRandomDestination} from './destination-mock.js';
 
-const createRandomEvent = () => {
+const createRandomEvent = (allOffers, destinations) => {
   const type = getRandomArrayElement(TYPE);
   const id = `${type}-${getRandomNumber(0, 20)}`;
   const { dateStart, dateEnd } = generateTwoDates(YEAR);
 
-  const destination = createRandomDestination();
+  const destination = getRandomArrayElement(destinations).id;
 
-  const offersByType = OFFERS.find((item) => item.type === type);
+  const offersByType = allOffers.find((item) => item.type === type);
   const allOffersForType = offersByType ? offersByType.offers : [];
   const eventOffers = allOffersForType
     .filter(() => Math.random() > 0.5)

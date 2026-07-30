@@ -5,10 +5,10 @@ import AbstractView from '../framework/view/abstract-view.js';
 const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 
-function createEventTemplate(event) {
-  const {type, destination, dueDateStart, dueDateEnd, price, isFavorite, offers} = event;
+function createEventTemplate(event, allOffers, destination) {
+  const {type, dueDateStart, dueDateEnd, price, isFavorite} = event;
 
-  const destinationName = destination?.destination ?? 'Unknown';
+  const destinationName = destination.name;
 
   const date = formatDate(dueDateStart);
   const humanizeDate = humanizeEventDueDate(dueDateStart, DATE_FORMAT);
@@ -21,7 +21,7 @@ function createEventTemplate(event) {
 
   const duration = formatDateDiff(timeStart, timeEnd);
 
-  const offersView = new OffersView({ offerIds: offers || [] });
+  const offersView = new OffersView({event, offers: allOffers});
   const offersTemplate = offersView.template;
 
   const favoriteButtonClass = isFavorite ? 'event__favorite-btn--active' : '';
@@ -65,11 +65,15 @@ function createEventTemplate(event) {
 
 export default class EventView extends AbstractView {
   #event = null;
+  #offers = null;
+  #destination = null;
   #handleRollupClick = null;
 
-  constructor({event, onRollupClick}) {
+  constructor({event, offers, destination, onRollupClick}) {
     super();
     this.#event = event;
+    this.#offers = offers;
+    this.#destination = destination;
     this.#handleRollupClick = onRollupClick;
 
     this.element.querySelector('.event__rollup-btn')
@@ -77,7 +81,7 @@ export default class EventView extends AbstractView {
   }
 
   get template() {
-    return createEventTemplate(this.#event);
+    return createEventTemplate(this.#event, this.#offers, this.#destination);
   }
 
   #clickHandler = (evt) => {
