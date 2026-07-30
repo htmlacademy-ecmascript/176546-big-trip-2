@@ -1,4 +1,3 @@
-import {getOfferById} from './offers-view.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createTripCostTemplate(events, allOffers) {
