@@ -1,60 +1,14 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createTripInfoTemplate(events, allDestinations) {
-  if (!events || events.length === 0) {
-    return `
-      <div class="trip-info__main">
-        <h1 class="trip-info__title">No destinations</h1>
-        <p class="trip-info__dates">No dates</p>
-      </div>
-    `;
-  }
+const MAX_VISIBLE_CITIES = 3;
+const dateFormat = 'DD MMM';
 
-  const destinationIds = events.map((event) => event.destination);
-  const destinations = allDestinations.destinations.filter((dest) => destinationIds.includes(dest.id));
-
-  const destinationNames = destinationIds.map((id) => {
-    const dest = destinations.find((d) => d.id === id);
-    return dest?.name;
-  });
-
-  let destinationsChain = '';
-  if (destinationNames.length === 0) {
-    destinationsChain = 'No destinations';
-  } else if (destinationNames.length <= 3) {
-    destinationsChain = destinationNames.join(' &mdash; ');
-  } else {
-    const firstCity = destinationNames[0];
-    const lastCity = destinationNames[destinationNames.length - 1];
-    destinationsChain = `${firstCity} &mdash; ... &mdash; ${lastCity}`;
-  }
-
-  const dates = events
-    .map((event) => event.dueDateStart)
-    .filter((date) => date)
-    .sort((a, b) => new Date(a) - new Date(b));
-
-  const startDate = dates.length > 0 ? dates[0] : null;
-  const endDate = dates.length > 0 ? dates[dates.length - 1] : null;
-
-  const dateFormat = 'DD MMM';
-  const startFormatted = startDate ? dayjs(startDate).format(dateFormat) : '';
-  const endFormatted = endDate ? dayjs(endDate).format(dateFormat) : '';
-
-  let datesString = '';
-  if (startFormatted && endFormatted) {
-    if (startFormatted === endFormatted) {
-      datesString = startFormatted;
-    } else {
-      datesString = `${startFormatted} &mdash; ${endFormatted}`;
-    }
-  }
-
+function createTripInfoTemplate(tripDateData, tripCityData) {
   return `
     <div class="trip-info__main">
-      <h1 class="trip-info__title">${destinationsChain}</h1>
-      ${datesString ? `<p class="trip-info__dates">${datesString}</p>` : ''}
+      <h1 class="trip-info__title">${tripCityData}</h1>
+      <p class="trip-info__dates">${tripDateData}</p>
     </div>
   `;
 }
@@ -70,6 +24,47 @@ export default class TripInfoView extends AbstractView {
   }
 
   get template() {
-    return createTripInfoTemplate(this.#events, this.#allDestinations);
+    const tripCityData = this.#calculateCityInfo();
+    const tripDateData = this.#calculateDateTripInfo();
+
+    return createTripInfoTemplate(tripDateData, tripCityData);
   }
+
+  #calculateCityInfo = () => {
+    if (this.#events.length === 0) {
+      return 'No destinations';
+    }
+
+    const destinationIds = this.#events.map((event) => event.destination);
+    const destinations = this.#allDestinations.destinations.filter((dest) => destinationIds.includes(dest.id));
+
+    const destinationNames = destinations.map((dest) => dest.name);
+
+    let result = '';
+    if (destinationNames.length <= MAX_VISIBLE_CITIES) {
+      result = destinationNames.join(' &mdash; ');
+    } else {
+      const firstCity = destinationNames[0];
+      const lastCity = destinationNames.at(-1);
+
+      result = `${firstCity} &mdash; ... &mdash; ${lastCity}`;
+    }
+
+    return result;
+  };
+
+  #calculateDateTripInfo = () => {
+    if (this.#events.length === 0) {
+      return 'No dates';
+    }
+
+    const dates = this.#events
+      .map((event) => event.dueDateStart)
+      .sort((a, b) => new Date(a) - new Date(b));
+
+    const startDate = dayjs(dates[0]).format(dateFormat);
+    const endDate = dayjs(dates.at(-1)).format(dateFormat);
+
+    return startDate === endDate ? startDate : `${startDate} &mdash; ${endDate}`;
+  };
 }
