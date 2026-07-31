@@ -5,6 +5,7 @@ import EventsModel from './model/event-model.js';
 import OffersModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import TripHeaderView from './view/trip-header-view.js';
+import {generateFilter} from "./filter";
 
 const tripMain = document.querySelector('.trip-main');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
@@ -29,7 +30,9 @@ const tripHeaderView = new TripHeaderView({
   allOffers: offersModel.offers,
   allDestinations: destinationModel });
 
+const filters = generateFilter(eventsModel.events);
+
 render(tripHeaderView, tripMain, RenderPosition.AFTERBEGIN);
-render(new FiltersView(), tripControlsFilters);
+render(new FiltersView({filters}), tripControlsFilters);
 
 boardPresenter.init();
