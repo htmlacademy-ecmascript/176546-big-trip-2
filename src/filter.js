@@ -1,17 +1,11 @@
 import {FilterType} from './const.js';
 import dayjs from 'dayjs';
 
-const isEventOverdue = (dueDate) => {
-  return dueDate && dayjs(dueDate).isBefore(dayjs(), 'day');
-};
+const isEventOverdue = (dueDate) => dueDate && dayjs(dueDate).isBefore(dayjs(), 'day');
 
-const isEventUpcoming = (dueDate) => {
-  return dueDate && dayjs(dueDate).isAfter(dayjs(), 'day');
-};
+const isEventUpcoming = (dueDate) => dueDate && dayjs(dueDate).isAfter(dayjs(), 'day');
 
-const isEventExpiringToday = (dueDate) => {
-  return dueDate && dayjs(dueDate).isSame(dayjs(), 'day');
-};
+const isEventExpiringToday = (dueDate) => dueDate && dayjs(dueDate).isSame(dayjs(), 'day');
 
 const filter = {
   [FilterType.EVERYTHING]: ((events) => events),
