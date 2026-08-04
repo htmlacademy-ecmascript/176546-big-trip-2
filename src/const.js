@@ -210,5 +210,12 @@ const DESCRIPTION = [
   'In rutrum ac purus sit amet tempus.'
 ];
 
-export {TYPE, MIN_PRICE, MAX_PRICE, DESCRIPTION, YEAR, LINK_FOTO, DESTINATION, OFFERS};
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
+};
+
+export {TYPE, MIN_PRICE, MAX_PRICE, DESCRIPTION, YEAR, LINK_FOTO, DESTINATION, OFFERS, FilterType};
 
