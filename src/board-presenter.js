@@ -5,6 +5,7 @@ import EventListView from './view/event-list-view.js';
 import ListEmptyView from './view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import {SortType} from './const.js';
+import {sortEventDay, sortEventPrice, sortEventTime} from './sort.js';
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -61,6 +62,7 @@ export default class BoardPresenter {
     }
 
     this.#sortEvents(sortType);
+    this.#renderBoard();
   };
 
   #renderSort() {
@@ -131,17 +133,15 @@ export default class BoardPresenter {
 
   #sortEvents(sortType) {
     switch(sortType) {
-      case SortType.TIME:
-        // this.#boardEvents.sort(sortEventTime);
-        break;
       case SortType.PRICE:
-        // this.#boardEvents.sort(sortEventPrice);
+        this.#boardEvents = [...this.#souredBoardEvents].sort(sortEventPrice);
+        break;
+      case SortType.TIME:
+        this.#boardEvents = [...this.#souredBoardEvents].sort(sortEventTime);
         break;
       default:
-        this.#boardEvents = [...this.#souredBoardEvents]
-          .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+        this.#boardEvents = [...this.#souredBoardEvents].sort(sortEventDay);
     }
-
     this.#currentSortType = sortType;
   }
 }

@@ -5,8 +5,8 @@ function createSortTemplate() {
   return (
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
       <div class="trip-sort__item  trip-sort__item--day">
-        <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked data-sort-type="${SortType.DAY}">
-        <label class="trip-sort__btn" for="sort-day">Day</label>
+        <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
+        <label class="trip-sort__btn" for="sort-day" data-sort-type="${SortType.DAY}">Day</label>
       </div>
 
       <div class="trip-sort__item  trip-sort__item--event">
@@ -15,13 +15,13 @@ function createSortTemplate() {
       </div>
 
       <div class="trip-sort__item  trip-sort__item--time">
-        <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time" data-sort-type="${SortType.TIME}">
-        <label class="trip-sort__btn" for="sort-time">Time</label>
+        <input id="sort-time" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-time">
+        <label class="trip-sort__btn" for="sort-time" data-sort-type="${SortType.TIME}">Time</label>
       </div>
 
       <div class="trip-sort__item  trip-sort__item--price">
-        <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" data-sort-type="${SortType.PRICE}">
-        <label class="trip-sort__btn" for="sort-price">Price</label>
+        <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+        <label class="trip-sort__btn" for="sort-price" data-sort-type="${SortType.PRICE}">Price</label>
       </div>
 
       <div class="trip-sort__item  trip-sort__item--offer">
@@ -35,7 +35,7 @@ function createSortTemplate() {
 export default class SortView extends AbstractView {
   #handleSortTypeChange = null;
 
-  constructor(onSortTypeChange) {
+  constructor({onSortTypeChange}) {
     super();
     this.#handleSortTypeChange = onSortTypeChange;
 
@@ -43,12 +43,25 @@ export default class SortView extends AbstractView {
   }
 
   #sortTypeChangeHandler = (evt) => {
-    if (evt.target.tagName !== 'INPUT') {
+    evt.preventDefault();
+
+    const label = evt.target.closest('[data-sort-type]');
+    if (!label) {
       return;
     }
 
-    evt.preventDefault();
-    this.#sortTypeChangeHandler(evt.target.dataset.sortType);
+    const sortItem = label.closest('.trip-sort__item');
+    if (sortItem) {
+      const input = sortItem.querySelector('input');
+      if (input && input.disabled) {
+        return;
+      }
+    }
+
+    const sortType = label.dataset.sortType;
+    if (this.#handleSortTypeChange) {
+      this.#handleSortTypeChange(sortType);
+    }
   };
 
 
