@@ -217,5 +217,22 @@ const FilterType = {
   PAST: 'past',
 };
 
-export {TYPE, MIN_PRICE, MAX_PRICE, DESCRIPTION, YEAR, LINK_FOTO, DESTINATION, OFFERS, FilterType};
+const SortType = {
+  DAY: 'default',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
+export {
+  TYPE,
+  MIN_PRICE,
+  MAX_PRICE,
+  DESCRIPTION,
+  YEAR,
+  LINK_FOTO,
+  DESTINATION,
+  OFFERS,
+  FilterType,
+  SortType
+};
 

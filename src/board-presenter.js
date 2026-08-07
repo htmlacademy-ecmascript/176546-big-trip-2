@@ -4,10 +4,11 @@ import SortView from './view/sort-view.js';
 import EventListView from './view/event-list-view.js';
 import ListEmptyView from './view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
+import {SortType} from './const.js';
 
 export default class BoardPresenter {
-  #eventListComponent = null; // ✅ Теперь null, создается в renderBoard
-  #sortComponent = null; // ✅ Добавляем поле
+  #eventListComponent = null;
+  #sortComponent = null;
   #boardContainer = null;
   #eventsModel = null;
   #destinationModel = null;
@@ -16,6 +17,8 @@ export default class BoardPresenter {
   #offers = null;
   #destinations = null;
   #eventPresenter = new Map();
+  #currentSortType = SortType.DAY;
+  #souredBoardEvents = [];
 
   constructor({boardContainer, eventsModel, destinationModel, offersModel}) {
     this.#boardContainer = boardContainer;
@@ -26,7 +29,8 @@ export default class BoardPresenter {
 
   init() {
     this.#boardEvents = [...this.#eventsModel.events];
-    this.#sortEvents();
+    this.#souredBoardEvents = [...this.#eventsModel.events];
+    this.#sortEvents(this.#currentSortType);
 
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
@@ -36,6 +40,7 @@ export default class BoardPresenter {
 
   #handleEventChange = (updatedEvent) => {
     this.#boardEvents = updateItem(this.#boardEvents, updatedEvent);
+    this.#souredBoardEvents = updateItem(this.#souredBoardEvents, updatedEvent);
 
     const eventPresenter = this.#eventPresenter.get(updatedEvent.id);
 
@@ -49,6 +54,22 @@ export default class BoardPresenter {
       );
     }
   };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortEvents(sortType);
+  };
+
+  #renderSort() {
+    this.#sortComponent = new SortView({
+      onSortTypeChange: this.#handleSortTypeChange
+    });
+
+    render(this.#sortComponent, this.#boardContainer);
+  }
 
   #handleModeChange = () => {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
@@ -100,8 +121,7 @@ export default class BoardPresenter {
       return;
     }
 
-    this.#sortComponent = new SortView();
-    render(this.#sortComponent, this.#boardContainer);
+    this.#renderSort();
 
     this.#eventListComponent = new EventListView();
     render(this.#eventListComponent, this.#boardContainer);
@@ -109,8 +129,19 @@ export default class BoardPresenter {
     this.#renderEventList();
   };
 
-  #sortEvents() {
-    this.#boardEvents = [...this.#boardEvents]
-      .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+  #sortEvents(sortType) {
+    switch(sortType) {
+      case SortType.TIME:
+        // this.#boardEvents.sort(sortEventTime);
+        break;
+      case SortType.PRICE:
+        // this.#boardEvents.sort(sortEventPrice);
+        break;
+      default:
+        this.#boardEvents = [...this.#souredBoardEvents]
+          .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+    }
+
+    this.#currentSortType = sortType;
   }
 }
