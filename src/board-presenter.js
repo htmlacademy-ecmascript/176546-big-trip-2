@@ -1,12 +1,13 @@
-import {render, replace} from './framework/render.js';
+import {render, remove} from './framework/render.js';
+import {updateItem} from './common.js';
 import SortView from './view/sort-view.js';
 import EventListView from './view/event-list-view.js';
-import EventView from './view/event-view.js';
-import EventFormView from './view/event-form-view.js';
 import ListEmptyView from './view/list-empty-view.js';
+import EventPresenter from './event-presenter.js';
 
 export default class BoardPresenter {
-  #eventListComponent = new EventListView();
+  #eventListComponent = null; // ✅ Теперь null, создается в renderBoard
+  #sortComponent = null; // ✅ Добавляем поле
   #boardContainer = null;
   #eventsModel = null;
   #destinationModel = null;
@@ -14,6 +15,7 @@ export default class BoardPresenter {
   #boardEvents = null;
   #offers = null;
   #destinations = null;
+  #eventPresenter = new Map();
 
   constructor({boardContainer, eventsModel, destinationModel, offersModel}) {
     this.#boardContainer = boardContainer;
@@ -23,8 +25,8 @@ export default class BoardPresenter {
   }
 
   init() {
-    this.#boardEvents = [...this.#eventsModel.events]
-      .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+    this.#boardEvents = [...this.#eventsModel.events];
+    this.#sortEvents();
 
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
@@ -32,63 +34,70 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
-  #renderEvent(event) {
-    const container = this.#eventListComponent.element;
+  #handleEventChange = (updatedEvent) => {
+    this.#boardEvents = updateItem(this.#boardEvents, updatedEvent);
+    this.#sortEvents();
 
-    function escKeyDownHandler(evt) {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    }
+    this.#clearEventList();
+    this.#renderBoard();
+  };
 
-    const eventComponent = new EventView({
-      event,
-      offers: this.#offers,
-      destination: this.#destinationModel.getDestinationById(event.destination),
-      onRollupClick: () => {
-        replaceCardToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
+  #renderEvent(event, container) {
+    const eventPresenter = new EventPresenter({
+      eventListContainer: container,
+      onDataChange: this.#handleEventChange,
     });
 
-    const eventEditComponent = new EventFormView({
+    const destination = this.#destinationModel.getDestinationById(event.destination);
+
+    eventPresenter.init({
       event,
       offers: this.#offers,
-      destinations: this.#destinations,
-      onSubmit: () => {
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      },
-      onClick: () => {
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
+      destination: destination,
+      destinations: this.#destinations
     });
 
-    function replaceCardToForm() {
-      replace(eventEditComponent, eventComponent);
+    this.#eventPresenter.set(event.id, eventPresenter);
+  }
+
+  #renderEventList() {
+    for (let i = 0; i < this.#boardEvents.length; i++) {
+      this.#renderEvent(this.#boardEvents[i], this.#eventListComponent.element);
+    }
+  }
+
+  #clearEventList() {
+    this.#eventPresenter.forEach((presenter) => presenter.destroy());
+    this.#eventPresenter.clear();
+
+    if (this.#sortComponent) {
+      remove(this.#sortComponent);
     }
 
-    function replaceFormToEvent() {
-      replace(eventComponent, eventEditComponent);
+    if (this.#eventListComponent) {
+      remove(this.#eventListComponent);
     }
-
-    render(eventComponent, container);
   }
 
   #renderBoard = () => {
+    this.#clearEventList();
+
     if (this.#boardEvents.length === 0) {
       render(new ListEmptyView(), this.#boardContainer);
       return;
     }
 
-    render(new SortView(), this.#boardContainer);
+    this.#sortComponent = new SortView();
+    render(this.#sortComponent, this.#boardContainer);
+
+    this.#eventListComponent = new EventListView();
     render(this.#eventListComponent, this.#boardContainer);
 
-    for (let i = 0; i < this.#boardEvents.length; i++) {
-      this.#renderEvent(this.#boardEvents[i]);
-    }
+    this.#renderEventList();
   };
+
+  #sortEvents() {
+    this.#boardEvents = [...this.#boardEvents]
+      .sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+  }
 }
