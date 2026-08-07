@@ -64,11 +64,11 @@ export default class EventPresenter {
       return;
     }
 
-    if (this.#mode = MODE.DEFAULT) {
+    if (this.#mode === MODE.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#mode = MODE.EDITING) {
+    if (this.#mode === MODE.EDITING) {
       replace(this.#eventEditComponent, prevEventEditComponent);
     }
 
