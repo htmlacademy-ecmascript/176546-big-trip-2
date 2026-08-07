@@ -2,6 +2,11 @@ import EventView from './view/event-view.js';
 import {remove, render, replace} from './framework/render.js';
 import EventFormView from './view/event-form-view.js';
 
+const MODE = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export default class EventPresenter {
   #eventListContainer = null;
   #eventComponent = null;
@@ -11,10 +16,13 @@ export default class EventPresenter {
   #destination = null;
   #destinations = null;
   #handleDataChange = null;
+  #handleModeChange = null;
+  #mode = MODE.DEFAULT;
 
-  constructor({eventListContainer, onDataChange}) {
+  constructor({eventListContainer, onDataChange, onModeChange}) {
     this.#eventListContainer = eventListContainer;
     this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init({event, offers, destination, destinations}) {
@@ -56,11 +64,11 @@ export default class EventPresenter {
       return;
     }
 
-    if (this.#eventListContainer.contains(prevEventComponent)) {
+    if (this.#mode = MODE.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#eventListContainer.contains(prevEventEditComponent)) {
+    if (this.#mode = MODE.EDITING) {
       replace(this.#eventEditComponent, prevEventEditComponent);
     }
 
@@ -73,6 +81,12 @@ export default class EventPresenter {
     remove(this.#eventEditComponent);
   }
 
+  resetView() {
+    if (this.#mode !== MODE.DEFAULT) {
+      this.#replaceFormToEvent();
+    }
+  }
+
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
@@ -83,10 +97,13 @@ export default class EventPresenter {
 
   #replaceCardToForm() {
     replace(this.#eventEditComponent, this.#eventComponent);
+    this.#handleModeChange();
+    this.#mode = MODE.EDITING;
   }
 
   #replaceFormToEvent() {
     replace(this.#eventComponent, this.#eventEditComponent);
+    this.#mode = MODE.DEFAULT;
   }
 
   #handleFavoriteClick = () => {

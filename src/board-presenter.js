@@ -50,10 +50,15 @@ export default class BoardPresenter {
     }
   };
 
+  #handleModeChange = () => {
+    this.#eventPresenter.forEach((presenter) => presenter.resetView());
+  };
+
   #renderEvent(event, container) {
     const eventPresenter = new EventPresenter({
       eventListContainer: container,
       onDataChange: this.#handleEventChange,
+      onModeChange: this.#handleModeChange,
     });
 
     const destination = this.#destinationModel.getDestinationById(event.destination);
