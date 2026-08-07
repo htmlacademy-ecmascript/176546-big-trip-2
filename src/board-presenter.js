@@ -36,10 +36,18 @@ export default class BoardPresenter {
 
   #handleEventChange = (updatedEvent) => {
     this.#boardEvents = updateItem(this.#boardEvents, updatedEvent);
-    this.#sortEvents();
 
-    this.#clearEventList();
-    this.#renderBoard();
+    const eventPresenter = this.#eventPresenter.get(updatedEvent.id);
+
+    if (eventPresenter) {
+      const destination = this.#destinationModel.getDestinationById(updatedEvent.destination);
+      eventPresenter.update(
+        updatedEvent,
+        this.#offers,
+        destination,
+        this.#destinations
+      );
+    }
   };
 
   #renderEvent(event, container) {

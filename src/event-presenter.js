@@ -92,4 +92,44 @@ export default class EventPresenter {
   #handleFavoriteClick = () => {
     this.#handleDataChange({...this.#event, isFavorite: !this.#event.isFavorite});
   };
+
+  update(event, offers, destination, destinations) {
+    this.#event = event;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#destinations = destinations;
+
+    const newEventComponent = new EventView({
+      event: this.#event,
+      offers: this.#offers,
+      destination: this.#destination,
+      onRollupClick: () => {
+        this.#replaceCardToForm();
+        document.addEventListener('keydown', this.#escKeyDownHandler);
+      },
+      onFavoriteClick: this.#handleFavoriteClick,
+    });
+
+    replace(newEventComponent, this.#eventComponent);
+    this.#eventComponent = newEventComponent;
+
+    const newEventEditComponent = new EventFormView({
+      event: this.#event,
+      offers: this.#offers,
+      destinations: this.#destinations,
+      onSubmit: () => {
+        this.#replaceFormToEvent();
+        document.removeEventListener('keydown', this.#escKeyDownHandler);
+      },
+      onClick: () => {
+        this.#replaceFormToEvent();
+        document.removeEventListener('keydown', this.#escKeyDownHandler);
+      }
+    });
+
+    if (this.#eventEditComponent && this.#eventEditComponent.element.parentNode) {
+      replace(newEventEditComponent, this.#eventEditComponent);
+      this.#eventEditComponent = newEventEditComponent;
+    }
+  }
 }
