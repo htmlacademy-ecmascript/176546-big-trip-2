@@ -1,11 +1,11 @@
 import FiltersView from './view/filters-view.js';
-import BoardPresenter from './board-presenter.js';
+import BoardPresenter from './presenter/board-presenter.js';
 import {render, RenderPosition} from './framework/render.js';
 import EventsModel from './model/event-model.js';
 import OffersModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import TripHeaderView from './view/trip-header-view.js';
-import {generateFilter} from './filter.js';
+import {generateFilter} from './util/filter.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');

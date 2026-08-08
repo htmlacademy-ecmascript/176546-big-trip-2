@@ -1,5 +1,5 @@
 import {TYPE, MIN_PRICE, MAX_PRICE, YEAR} from '../const.js';
-import {getRandomArrayElement, generateTwoDates, getRandomNumber, getRandomBoolean} from '../utils.js';
+import {getRandomArrayElement, generateTwoDates, getRandomNumber, getRandomBoolean} from '../util/utils.js';
 
 const createRandomEvent = (allOffers, destinations) => {
   const type = getRandomArrayElement(TYPE);
