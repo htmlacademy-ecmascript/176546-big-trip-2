@@ -2,7 +2,7 @@ import OffersFormView from './offers-form-view.js';
 import DestinationFormView from './destination-form-view.js';
 import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
-import {humanizeEventDueDate} from '../utils.js';
+import {humanizeEventDueDate} from '../util/utils.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 const TIME_FORMAT = 'DD/MM/YY HH:mm';

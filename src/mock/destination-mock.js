@@ -1,4 +1,4 @@
-import {generateRandomImages, generateRandomText, getRandomArrayElement, getRandomNumber} from '../utils.js';
+import {generateRandomImages, generateRandomText, getRandomArrayElement, getRandomNumber} from '../util/utils.js';
 import {DESCRIPTION, LINK_FOTO, DESTINATION} from '../const.js';
 
 function createRandomDestination() {

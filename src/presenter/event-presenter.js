@@ -1,6 +1,6 @@
-import EventView from './view/event-view.js';
-import {remove, render, replace} from './framework/render.js';
-import EventFormView from './view/event-form-view.js';
+import EventView from '../view/event-view.js';
+import {remove, render, replace} from '../framework/render.js';
+import EventFormView from '../view/event-form-view.js';
 
 const MODE = {
   DEFAULT: 'DEFAULT',
@@ -40,7 +40,6 @@ export default class EventPresenter {
       destination: this.#destination,
       onRollupClick: () => {
         this.#replaceCardToForm();
-        document.addEventListener('keydown', this.#escKeyDownHandler);
       },
       onFavoriteClick: this.#handleFavoriteClick,
     });
@@ -51,7 +50,6 @@ export default class EventPresenter {
       destinations: this.#destinations,
       onSubmit: () => {
         this.#replaceFormToEvent();
-        document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onClick: () => {
         this.#replaceFormToEvent();
@@ -91,7 +89,6 @@ export default class EventPresenter {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.#replaceFormToEvent();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
   };
 
@@ -99,11 +96,13 @@ export default class EventPresenter {
     replace(this.#eventEditComponent, this.#eventComponent);
     this.#handleModeChange();
     this.#mode = MODE.EDITING;
+    document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
   #replaceFormToEvent() {
     replace(this.#eventComponent, this.#eventEditComponent);
     this.#mode = MODE.DEFAULT;
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
   #handleFavoriteClick = () => {
@@ -122,7 +121,6 @@ export default class EventPresenter {
       destination: this.#destination,
       onRollupClick: () => {
         this.#replaceCardToForm();
-        document.addEventListener('keydown', this.#escKeyDownHandler);
       },
       onFavoriteClick: this.#handleFavoriteClick,
     });
@@ -136,11 +134,9 @@ export default class EventPresenter {
       destinations: this.#destinations,
       onSubmit: () => {
         this.#replaceFormToEvent();
-        document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onClick: () => {
         this.#replaceFormToEvent();
-        document.removeEventListener('keydown', this.#escKeyDownHandler);
       }
     });
 
