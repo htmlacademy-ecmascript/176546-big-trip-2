@@ -4,7 +4,11 @@ import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
 import {humanizeEventDueDate} from '../util/utils.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
 
+import 'flatpickr/dist/flatpickr.min.css';
+
+const DATE_FORMAT = 'd/m/y H:i';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
 function createEventFormTemplate(event, allOffers, allDestinations) {
@@ -87,6 +91,8 @@ export default class EventFormView extends AbstractStatefulView {
   #allDestinations = null;
   #handleFormSubmit = null;
   #handlerFormClick = null;
+  #datePickerStart = null;
+  #datePickerEnd = null;
 
   constructor({event, offers, destinations, onSubmit, onClick}) {
     super();
@@ -104,6 +110,20 @@ export default class EventFormView extends AbstractStatefulView {
       this._state,
       this.#allOffers,
       this.#allDestinations);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datePickerStart) {
+      this.#datePickerStart.destroy();
+      this.#datePickerStart = null;
+    }
+
+    if (this.#datePickerEnd) {
+      this.#datePickerEnd.destroy();
+      this.#datePickerEnd = null;
+    }
   }
 
   reset(event) {
@@ -137,6 +157,8 @@ export default class EventFormView extends AbstractStatefulView {
     offerCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
+
+    this.#setDatePickers();
   }
 
   #formSaveHandler = (evt) => {
@@ -169,6 +191,18 @@ export default class EventFormView extends AbstractStatefulView {
     if (toggle) {
       toggle.checked = false;
     }
+  };
+
+  #dueDateStartChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dueDateStart: userDate,
+    });
+  };
+
+  #dueDateEndChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dueDateEnd: userDate,
+    });
   };
 
   #destinationChangeHandler = (evt) => {
@@ -207,6 +241,37 @@ export default class EventFormView extends AbstractStatefulView {
       offers: currentOffers
     });
   };
+
+  #setDatePickers() {
+    const startInput = this.element.querySelector('#event-start-time-1');
+    const endInput = this.element.querySelector('#event-end-time-1');
+
+    if (startInput) {
+      this.#datePickerStart = flatpickr(
+        startInput,
+        {
+          dateFormat: DATE_FORMAT,
+          defaultDate: this._state.dueDateStart,
+          onChange: this.#dueDateStartChangeHandler,
+          enableTime: true,
+          time_24hr: true,
+        },
+      );
+    }
+
+    if (endInput) {
+      this.#datePickerEnd = flatpickr(
+        endInput,
+        {
+          dateFormat: DATE_FORMAT,
+          defaultDate: this._state.dueDateEnd,
+          onChange: this.#dueDateEndChangeHandler,
+          enableTime: true,
+          time_24hr: true,
+        },
+      );
+    }
+  }
 
   static parseEventToState(event) {
     return {
