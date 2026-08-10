@@ -214,7 +214,7 @@ export default class EventFormView extends AbstractStatefulView {
     };
   }
 
-  static parseStateToEvent(state) {
-    const event = {...state};
-  }
+  // static parseStateToEvent(state) {
+  //   const event = {...state};
+  // }
 }
