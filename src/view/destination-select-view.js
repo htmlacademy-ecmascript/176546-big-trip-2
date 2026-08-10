@@ -5,10 +5,11 @@ function createDestinationsTemplate(allDestinations, currentDestination) {
     return '';
   }
 
-  return allDestinations.map((destination) => {
-    const isSelected = destination === currentDestination ? 'selected' : '';
+  const uniqueNames = [...new Set(allDestinations.map((dest) => dest.name))];
 
-    return `<option value="${destination.name}" ${isSelected}></option>`;
+  return uniqueNames.map((name) => {
+    const isSelected = name === currentDestination ? 'selected' : '';
+    return `<option value="${name}" ${isSelected}></option>`;
   }).join('');
 }
 

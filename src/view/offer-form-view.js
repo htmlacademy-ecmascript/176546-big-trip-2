@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createOfferFormTemplate(offer, isChecked = false) {
-  const id = `event-offer-${offer}`;
+  const id = `event-offer-${offer.id}`;
 
   return (
     `<div class="event__offer-selector">
@@ -9,6 +9,7 @@ function createOfferFormTemplate(offer, isChecked = false) {
              id="${id}"
              type="checkbox"
              name="event-offer-${offer.id}"
+             value="${offer.id}"
              ${isChecked ? 'checked' : ''}>
       <label class="event__offer-label" for="${id}">
         <span class="event__offer-title">${offer.title}</span>
