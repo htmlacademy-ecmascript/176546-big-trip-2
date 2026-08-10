@@ -106,6 +106,12 @@ export default class EventFormView extends AbstractStatefulView {
       this.#allDestinations);
   }
 
+  reset(event) {
+    this.updateElement(
+      EventFormView.parseEventToState(event),
+    );
+  }
+
   _restoreHandlers() {
     const form = this.element.querySelector('form');
     if (form) {
@@ -135,7 +141,8 @@ export default class EventFormView extends AbstractStatefulView {
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit();
+    const eventData = EventFormView.parseStateToEvent(this._state);
+    this.#handleFormSubmit(eventData);
   };
 
   #formClickHandler = (evt) => {
@@ -214,7 +221,16 @@ export default class EventFormView extends AbstractStatefulView {
     };
   }
 
-  // static parseStateToEvent(state) {
-  //   const event = {...state};
-  // }
+  static parseStateToEvent(state) {
+    return {
+      id: state.id,
+      type: state.type,
+      destination: state.destination,
+      dueDateStart: state.dueDateStart,
+      dueDateEnd: state.dueDateEnd,
+      price: state.price,
+      offers: state.offers,
+      isFavorite: state.isFavorite
+    };
+  }
 }

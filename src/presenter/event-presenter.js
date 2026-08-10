@@ -48,12 +48,12 @@ export default class EventPresenter {
       event,
       offers: this.#offers,
       destinations: this.#destinations,
-      onSubmit: () => {
+      onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
+        this.#handleDataChange(updatedEvent);
       },
       onClick: () => {
         this.#replaceFormToEvent();
-        document.removeEventListener('keydown', this.#escKeyDownHandler);
       }
     });
 
@@ -81,6 +81,7 @@ export default class EventPresenter {
 
   resetView() {
     if (this.#mode !== MODE.DEFAULT) {
+      this.#eventEditComponent.reset(this.#event);
       this.#replaceFormToEvent();
     }
   }
@@ -100,6 +101,8 @@ export default class EventPresenter {
   }
 
   #replaceFormToEvent() {
+    this.#eventEditComponent.reset(this.#event);
+
     replace(this.#eventComponent, this.#eventEditComponent);
     this.#mode = MODE.DEFAULT;
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -132,13 +135,16 @@ export default class EventPresenter {
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
-      onSubmit: () => {
+      onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
+        this.#handleDataChange(updatedEvent);
       },
       onClick: () => {
         this.#replaceFormToEvent();
       }
     });
+
+    this.#eventEditComponent = newEventEditComponent;
 
     if (this.#eventEditComponent && this.#eventEditComponent.element.parentNode) {
       replace(newEventEditComponent, this.#eventEditComponent);
