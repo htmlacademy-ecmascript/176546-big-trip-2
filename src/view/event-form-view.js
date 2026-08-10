@@ -254,7 +254,6 @@ export default class EventFormView extends AbstractStatefulView {
           defaultDate: this._state.dueDateStart,
           onChange: this.#dueDateStartChangeHandler,
           enableTime: true,
-          time_24hr: true,
         },
       );
     }
@@ -267,7 +266,6 @@ export default class EventFormView extends AbstractStatefulView {
           defaultDate: this._state.dueDateEnd,
           onChange: this.#dueDateEndChangeHandler,
           enableTime: true,
-          time_24hr: true,
         },
       );
     }
