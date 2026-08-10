@@ -3,7 +3,7 @@ import DestinationFormView from './destination-form-view.js';
 import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
 import {humanizeEventDueDate} from '../util/utils.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
@@ -82,8 +82,7 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
   );
 }
 
-export default class EventFormView extends AbstractView {
-  #event = null;
+export default class EventFormView extends AbstractStatefulView {
   #allOffers = null;
   #allDestinations = null;
   #handleFormSubmit = null;
@@ -91,24 +90,47 @@ export default class EventFormView extends AbstractView {
 
   constructor({event, offers, destinations, onSubmit, onClick}) {
     super();
-    this.#event = event;
+    this._setState(EventFormView.parseEventToState(event));
     this.#allOffers = offers;
     this.#allDestinations = destinations;
     this.#handleFormSubmit = onSubmit;
     this.#handlerFormClick = onClick;
 
-    this.element.querySelector('form')
-      .addEventListener('submit', this.#formSaveHandler);
-
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#formClickHandler);
+    this._restoreHandlers();
   }
 
   get template() {
     return createEventFormTemplate(
-      this.#event,
+      this._state,
       this.#allOffers,
       this.#allDestinations);
+  }
+
+  _restoreHandlers() {
+    const form = this.element.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', this.#formSaveHandler);
+    }
+
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', this.#formClickHandler);
+    }
+
+    const typeInputs = this.element.querySelectorAll('.event__type-input');
+    typeInputs.forEach((input) => {
+      input.addEventListener('change', this.#eventTypeChangeHandler);
+    });
+
+    const destinationInput = this.element.querySelector('.event__input--destination');
+    if (destinationInput) {
+      destinationInput.addEventListener('change', this.#destinationChangeHandler);
+    }
+
+    const offerCheckboxes = this.element.querySelectorAll('.event__offer-checkbox');
+    offerCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', this.#offerChangeHandler);
+    });
   }
 
   #formSaveHandler = (evt) => {
@@ -120,4 +142,79 @@ export default class EventFormView extends AbstractView {
     evt.preventDefault();
     this.#handlerFormClick();
   };
+
+  #eventTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    const newType = evt.target.value;
+
+    this._state = {
+      ...this._state,
+      type: newType,
+    };
+
+    this.updateElement({
+      type: newType,
+      offers: []
+    });
+
+    const toggle = this.element.querySelector('.event__type-toggle');
+    if (toggle) {
+      toggle.checked = false;
+    }
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    const destinationName = evt.target.value;
+
+    const destinationData = this.#allDestinations.find(
+      (dest) => dest.name === destinationName
+    );
+
+    if (destinationData) {
+      this.updateElement({
+        destination: destinationData.id,
+      });
+    }
+  };
+
+  #offerChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    const checkbox = evt.target;
+    const offerId = checkbox.value;
+
+    let currentOffers = [...this._state.offers];
+
+    if (evt.target.checked) {
+      if (!currentOffers.includes(offerId)) {
+        currentOffers.push(offerId);
+      }
+    } else {
+      currentOffers = currentOffers.filter((id) => id !== offerId);
+    }
+
+    this.updateElement({
+      offers: currentOffers
+    });
+  };
+
+  static parseEventToState(event) {
+    return {
+      id: event.id,
+      type: event.type,
+      destination: event.destination,
+      dueDateStart: event.dueDateStart,
+      dueDateEnd: event.dueDateEnd,
+      price: event.price,
+      offers: event.offers,
+      isFavorite: event.isFavorite
+    };
+  }
+
+  static parseStateToEvent(state) {
+    const event = {...state};
+  }
 }
