@@ -8,6 +8,6 @@ const sortEventTime = (eventA, eventB) => {
 };
 
 const sortEventprice = (eventA, eventB) =>
-  eventB.price - eventA.price;
+  eventB.basePrice - eventA.basePrice;
 
 export {sortEventDay, sortEventTime, sortEventprice};

@@ -68,7 +68,7 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
               <span class="visually-hidden">price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.price}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -217,7 +217,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     if (!isNaN(newPrice) && newPrice >= 0) {
       this.updateElement({
-        price: newPrice,
+        basePrice: newPrice,
       });
     }
   };
@@ -276,7 +276,7 @@ export default class EventFormView extends AbstractStatefulView {
       destination: event.destination,
       dateFrom: event.dateFrom,
       dateTo: event.dateTo,
-      price: event.price,
+      basePrice: event.basePrice,
       offers: event.offers,
       isFavorite: event.isFavorite
     };
@@ -289,7 +289,7 @@ export default class EventFormView extends AbstractStatefulView {
       destination: state.destination,
       dateFrom: state.dateFrom,
       dateTo: state.dateTo,
-      price: state.price,
+      basePrice: state.basePrice,
       offers: state.offers,
       isFavorite: state.isFavorite
     };
