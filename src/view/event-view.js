@@ -6,7 +6,7 @@ const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 
 function createEventTemplate(event, allOffers, destination) {
-  const {type, dateFrom, dateTo, basePrice, isFavorite} = event;
+  const {type, dateFrom, dateTo, price, isFavorite} = event;
 
   const destinationName = destination.name;
 
@@ -43,8 +43,8 @@ function createEventTemplate(event, allOffers, destination) {
           </p>
           <p class="event__duration">${duration}</p>
         </div>
-        <p class="event__basePrice">
-          &euro;&nbsp;<span class="event__basePrice-value">${basePrice}</span>
+        <p class="event__price">
+          &euro;&nbsp;<span class="event__price-value">${price}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">

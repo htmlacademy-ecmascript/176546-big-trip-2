@@ -10,14 +10,14 @@ function createTripCostTemplate(events, allOffers) {
   }
 
   const totalCost = events.reduce((sum, event) => {
-    let eventTotal = event.basePrice;
+    let eventTotal = event.price;
     const offerByType = allOffers.find((offer) => offer.type === event.type);
 
     if (event.offers.length > 0) {
       const offersTotal = event.offers.reduce((acc, offerId) => {
-        const totalbasePrice = offerByType.offers.find((offer) => offer.id === offerId).basePrice;
+        const totalprice = offerByType.offers.find((offer) => offer.id === offerId).price;
 
-        return acc + totalbasePrice;
+        return acc + totalprice;
       }, 0);
 
       eventTotal += offersTotal;

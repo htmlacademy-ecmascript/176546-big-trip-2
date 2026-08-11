@@ -5,7 +5,7 @@ import EventListView from '../view/event-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import {SortType} from '../const.js';
-import {sortEventDay, sortEventbasePrice, sortEventTime} from '../util/sort.js';
+import {sortEventDay, sortEventprice, sortEventTime} from '../util/sort.js';
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -135,7 +135,7 @@ export default class BoardPresenter {
 
   #getSortedEvents(sortType) {
     const sortFunctions = {
-      [SortType.basePrice]: sortEventbasePrice,
+      [SortType.price]: sortEventprice,
       [SortType.TIME]: sortEventTime,
       [SortType.DAY]: sortEventDay,
     };

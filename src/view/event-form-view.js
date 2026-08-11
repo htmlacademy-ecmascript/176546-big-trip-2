@@ -63,12 +63,12 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
             <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value='${humanizeTimeEnd}'>
           </div>
 
-          <div class="event__field-group  event__field-group--basePrice">
-            <label class="event__label" for="event-basePrice-1">
-              <span class="visually-hidden">basePrice</span>
+          <div class="event__field-group  event__field-group--price">
+            <label class="event__label" for="event-price-1">
+              <span class="visually-hidden">price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--basePrice" id="event-basePrice-1" type="text" name="event-basePrice" value="${event.basePrice}">
+            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.price}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -158,7 +158,7 @@ export default class EventFormView extends AbstractStatefulView {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
-    const priceInput = this.element.querySelector('.event__input--basePrice');
+    const priceInput = this.element.querySelector('.event__input--price');
     if (priceInput) {
       priceInput.addEventListener('change', this.#priceChangeHandler);
     }
@@ -217,7 +217,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     if (!isNaN(newPrice) && newPrice >= 0) {
       this.updateElement({
-        basePrice: newPrice,
+        price: newPrice,
       });
     }
   };
@@ -276,7 +276,7 @@ export default class EventFormView extends AbstractStatefulView {
       destination: event.destination,
       dateFrom: event.dateFrom,
       dateTo: event.dateTo,
-      basePrice: event.basePrice,
+      price: event.price,
       offers: event.offers,
       isFavorite: event.isFavorite
     };
@@ -289,7 +289,7 @@ export default class EventFormView extends AbstractStatefulView {
       destination: state.destination,
       dateFrom: state.dateFrom,
       dateTo: state.dateTo,
-      basePrice: state.basePrice,
+      price: state.price,
       offers: state.offers,
       isFavorite: state.isFavorite
     };

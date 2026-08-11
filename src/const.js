@@ -22,17 +22,17 @@ const OFFERS = [
       {
         'id': 'offer-1',
         'title': 'Upgrade to a business class',
-        'basePrice': 120
+        'price': 120
       },
       {
         'id': 'offer-2',
         'title': 'Extra luggage space',
-        'basePrice': 50
+        'price': 50
       },
       {
         'id': 'offer-3',
         'title': 'Child seat',
-        'basePrice': 25
+        'price': 25
       }
     ]
   },
@@ -42,12 +42,12 @@ const OFFERS = [
       {
         'id': 'offer-4',
         'title': 'Wi-Fi connection',
-        'basePrice': 15
+        'price': 15
       },
       {
         'id': 'offer-5',
         'title': 'USB charging port',
-        'basePrice': 10
+        'price': 10
       }
     ]
   },
@@ -57,17 +57,17 @@ const OFFERS = [
       {
         'id': 'offer-6',
         'title': 'First class seat',
-        'basePrice': 200
+        'price': 200
       },
       {
         'id': 'offer-7',
         'title': 'Dining car reservation',
-        'basePrice': 45
+        'price': 45
       },
       {
         'id': 'offer-8',
         'title': 'Quiet zone',
-        'basePrice': 30
+        'price': 30
       }
     ]
   },
@@ -77,12 +77,12 @@ const OFFERS = [
       {
         'id': 'offer-9',
         'title': 'GPS navigation',
-        'basePrice': 35
+        'price': 35
       },
       {
         'id': 'offer-10',
         'title': 'Additional driver',
-        'basePrice': 60
+        'price': 60
       }
     ]
   },
@@ -92,17 +92,17 @@ const OFFERS = [
       {
         'id': 'offer-11',
         'title': 'Cabin with sea view',
-        'basePrice': 350
+        'price': 350
       },
       {
         'id': 'offer-12',
         'title': 'Breakfast included',
-        'basePrice': 80
+        'price': 80
       },
       {
         'id': 'offer-13',
         'title': 'VIP lounge access',
-        'basePrice': 150
+        'price': 150
       }
     ]
   },
@@ -112,22 +112,22 @@ const OFFERS = [
       {
         'id': 'offer-14',
         'title': 'Extra legroom',
-        'basePrice': 180
+        'price': 180
       },
       {
         'id': 'offer-15',
         'title': 'Priority boarding',
-        'basePrice': 70
+        'price': 70
       },
       {
         'id': 'offer-16',
         'title': 'Meal preference',
-        'basePrice': 40
+        'price': 40
       },
       {
         'id': 'offer-17',
         'title': 'Travel insurance',
-        'basePrice': 95
+        'price': 95
       }
     ]
   },
@@ -137,17 +137,17 @@ const OFFERS = [
       {
         'id': 'offer-18',
         'title': 'Early check-in',
-        'basePrice': 65
+        'price': 65
       },
       {
         'id': 'offer-19',
         'title': 'Room upgrade',
-        'basePrice': 220
+        'price': 220
       },
       {
         'id': 'offer-20',
         'title': 'Welcome drink',
-        'basePrice': 20
+        'price': 20
       }
     ]
   },
@@ -157,12 +157,12 @@ const OFFERS = [
       {
         'id': 'offer-21',
         'title': 'Audio guide',
-        'basePrice': 18
+        'price': 18
       },
       {
         'id': 'offer-22',
         'title': 'Skip-the-line ticket',
-        'basePrice': 55
+        'price': 55
       }
     ]
   },
@@ -172,17 +172,17 @@ const OFFERS = [
       {
         'id': 'offer-23',
         'title': 'Set dinner menu',
-        'basePrice': 120
+        'price': 120
       },
       {
         'id': 'offer-24',
         'title': 'Wine pairing',
-        'basePrice': 85
+        'price': 85
       },
       {
         'id': 'offer-25',
         'title': 'Window table reservation',
-        'basePrice': 40
+        'price': 40
       }
     ]
   }
@@ -220,7 +220,7 @@ const FilterType = {
 const SortType = {
   DAY: 'day',
   TIME: 'time',
-  basePrice: 'basePrice',
+  price: 'price',
 };
 
 export {

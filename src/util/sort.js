@@ -7,7 +7,7 @@ const sortEventTime = (eventA, eventB) => {
   return durationB - durationA;
 };
 
-const sortEventbasePrice = (eventA, eventB) =>
-  eventB.basePrice - eventA.basePrice;
+const sortEventprice = (eventA, eventB) =>
+  eventB.price - eventA.price;
 
-export {sortEventDay, sortEventTime, sortEventbasePrice};
+export {sortEventDay, sortEventTime, sortEventprice};

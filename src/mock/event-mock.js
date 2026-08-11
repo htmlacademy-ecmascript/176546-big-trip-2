@@ -21,7 +21,7 @@ const createRandomEvent = (allOffers, destinations) => {
     dateTo: dateEnd,
     destination: destination,
     isFavorite: getRandomBoolean(),
-    basePrice: getRandomNumber(MIN_BASE_PRICE, MAX_BASE_PRICE),
+    price: getRandomNumber(MIN_BASE_PRICE, MAX_BASE_PRICE),
     offers: eventOffers,
   };
 };

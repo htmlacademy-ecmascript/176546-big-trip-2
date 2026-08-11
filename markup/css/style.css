@@ -363,7 +363,7 @@ main {
     width: 300px; }
   .trip-sort__item--time {
     width: 225px; }
-  .trip-sort__item--basePrice {
+  .trip-sort__item--price {
     width: 90px; }
 
 .trip-sort__btn {
@@ -584,7 +584,7 @@ main {
   color: #999999;
   opacity: 0.9; }
 
-.event__basePrice {
+.event__price {
   -ms-flex-negative: 0;
       flex-shrink: 0;
   width: 90px;
@@ -668,7 +668,7 @@ main {
   .event__input--time {
     width: 130px;
     text-align: center; }
-  .event__input--basePrice {
+  .event__input--price {
     width: 66px; }
 
 .event__save-btn {

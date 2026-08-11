@@ -14,7 +14,7 @@ function createOfferFormTemplate(offer, isChecked = false) {
       <label class="event__offer-label" for="${id}">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-basePrice">${offer.basePrice}</span>
+        <span class="event__offer-price">${offer.price}</span>
       </label>
     </div>`
   );
