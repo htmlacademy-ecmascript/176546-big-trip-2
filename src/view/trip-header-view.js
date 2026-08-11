@@ -21,7 +21,7 @@ export default class TripHeaderView extends AbstractView {
 
   constructor({ events, allOffers, allDestinations }) {
     super();
-    this.#events = events.sort((a, b) => new Date(a.dueDateStart) - new Date(b.dueDateStart));
+    this.#events = events.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
     this.#allOffers = allOffers;
     this.#allDestinations = allDestinations;
   }

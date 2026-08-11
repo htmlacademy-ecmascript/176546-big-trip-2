@@ -59,7 +59,7 @@ export default class TripInfoView extends AbstractView {
     }
 
     const dates = this.#events
-      .map((event) => event.dueDateStart)
+      .map((event) => event.dateFrom)
       .sort((a, b) => new Date(a) - new Date(b));
 
     const startDate = dayjs(dates[0]).format(dateFormat);

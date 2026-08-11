@@ -1,5 +1,5 @@
-const MIN_PRICE = 100;
-const MAX_PRICE = 1000;
+const MIN_BASE_PRICE = 100;
+const MAX_BASE_PRICE = 1000;
 const YEAR = 2026;
 const LINK_FOTO = 'https://loremflickr.com/248/152?random=';
 
@@ -22,17 +22,17 @@ const OFFERS = [
       {
         'id': 'offer-1',
         'title': 'Upgrade to a business class',
-        'price': 120
+        'basePrice': 120
       },
       {
         'id': 'offer-2',
         'title': 'Extra luggage space',
-        'price': 50
+        'basePrice': 50
       },
       {
         'id': 'offer-3',
         'title': 'Child seat',
-        'price': 25
+        'basePrice': 25
       }
     ]
   },
@@ -42,12 +42,12 @@ const OFFERS = [
       {
         'id': 'offer-4',
         'title': 'Wi-Fi connection',
-        'price': 15
+        'basePrice': 15
       },
       {
         'id': 'offer-5',
         'title': 'USB charging port',
-        'price': 10
+        'basePrice': 10
       }
     ]
   },
@@ -57,17 +57,17 @@ const OFFERS = [
       {
         'id': 'offer-6',
         'title': 'First class seat',
-        'price': 200
+        'basePrice': 200
       },
       {
         'id': 'offer-7',
         'title': 'Dining car reservation',
-        'price': 45
+        'basePrice': 45
       },
       {
         'id': 'offer-8',
         'title': 'Quiet zone',
-        'price': 30
+        'basePrice': 30
       }
     ]
   },
@@ -77,12 +77,12 @@ const OFFERS = [
       {
         'id': 'offer-9',
         'title': 'GPS navigation',
-        'price': 35
+        'basePrice': 35
       },
       {
         'id': 'offer-10',
         'title': 'Additional driver',
-        'price': 60
+        'basePrice': 60
       }
     ]
   },
@@ -92,17 +92,17 @@ const OFFERS = [
       {
         'id': 'offer-11',
         'title': 'Cabin with sea view',
-        'price': 350
+        'basePrice': 350
       },
       {
         'id': 'offer-12',
         'title': 'Breakfast included',
-        'price': 80
+        'basePrice': 80
       },
       {
         'id': 'offer-13',
         'title': 'VIP lounge access',
-        'price': 150
+        'basePrice': 150
       }
     ]
   },
@@ -112,22 +112,22 @@ const OFFERS = [
       {
         'id': 'offer-14',
         'title': 'Extra legroom',
-        'price': 180
+        'basePrice': 180
       },
       {
         'id': 'offer-15',
         'title': 'Priority boarding',
-        'price': 70
+        'basePrice': 70
       },
       {
         'id': 'offer-16',
         'title': 'Meal preference',
-        'price': 40
+        'basePrice': 40
       },
       {
         'id': 'offer-17',
         'title': 'Travel insurance',
-        'price': 95
+        'basePrice': 95
       }
     ]
   },
@@ -137,17 +137,17 @@ const OFFERS = [
       {
         'id': 'offer-18',
         'title': 'Early check-in',
-        'price': 65
+        'basePrice': 65
       },
       {
         'id': 'offer-19',
         'title': 'Room upgrade',
-        'price': 220
+        'basePrice': 220
       },
       {
         'id': 'offer-20',
         'title': 'Welcome drink',
-        'price': 20
+        'basePrice': 20
       }
     ]
   },
@@ -157,12 +157,12 @@ const OFFERS = [
       {
         'id': 'offer-21',
         'title': 'Audio guide',
-        'price': 18
+        'basePrice': 18
       },
       {
         'id': 'offer-22',
         'title': 'Skip-the-line ticket',
-        'price': 55
+        'basePrice': 55
       }
     ]
   },
@@ -172,17 +172,17 @@ const OFFERS = [
       {
         'id': 'offer-23',
         'title': 'Set dinner menu',
-        'price': 120
+        'basePrice': 120
       },
       {
         'id': 'offer-24',
         'title': 'Wine pairing',
-        'price': 85
+        'basePrice': 85
       },
       {
         'id': 'offer-25',
         'title': 'Window table reservation',
-        'price': 40
+        'basePrice': 40
       }
     ]
   }
@@ -220,13 +220,13 @@ const FilterType = {
 const SortType = {
   DAY: 'day',
   TIME: 'time',
-  PRICE: 'price',
+  basePrice: 'basePrice',
 };
 
 export {
   TYPE,
-  MIN_PRICE,
-  MAX_PRICE,
+  MIN_BASE_PRICE,
+  MAX_BASE_PRICE,
   DESCRIPTION,
   YEAR,
   LINK_FOTO,

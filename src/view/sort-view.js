@@ -19,9 +19,9 @@ function createSortTemplate(currentSortType) {
         <label class="trip-sort__btn" for="sort-time">Time</label>
       </div>
 
-      <div class="trip-sort__item  trip-sort__item--price">
-        <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="price" ${currentSortType === SortType.PRICE ? 'checked' : ''}>
-        <label class="trip-sort__btn" for="sort-price">Price</label>
+      <div class="trip-sort__item  trip-sort__item--basePrice">
+        <input id="sort-basePrice" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="basePrice" ${currentSortType === SortType.basePrice ? 'checked' : ''}>
+        <label class="trip-sort__btn" for="sort-basePrice">basePrice</label>
       </div>
 
       <div class="trip-sort__item  trip-sort__item--offer">

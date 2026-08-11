@@ -36,8 +36,8 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
     currentType: event.type
   }).template;
 
-  const humanizeTimeStart = humanizeEventDueDate(event.dueDateStart, TIME_FORMAT);
-  const humanizeTimeEnd = humanizeEventDueDate(event.dueDateEnd, TIME_FORMAT);
+  const humanizeTimeStart = humanizeEventDueDate(event.dateFrom, TIME_FORMAT);
+  const humanizeTimeEnd = humanizeEventDueDate(event.dateTo, TIME_FORMAT);
 
   return (
     `<li class="trip-events__item">
@@ -63,12 +63,12 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
             <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value='${humanizeTimeEnd}'>
           </div>
 
-          <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price-1">
-              <span class="visually-hidden">Price</span>
+          <div class="event__field-group  event__field-group--basePrice">
+            <label class="event__label" for="event-basePrice-1">
+              <span class="visually-hidden">basePrice</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.price}">
+            <input class="event__input  event__input--basePrice" id="event-basePrice-1" type="text" name="event-basePrice" value="${event.basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -158,6 +158,11 @@ export default class EventFormView extends AbstractStatefulView {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
+    const priceInput = this.element.querySelector('.event__input--basePrice');
+    if (priceInput) {
+      priceInput.addEventListener('change', this.#priceChangeHandler);
+    }
+
     this.#setDatePickers();
   }
 
@@ -173,41 +178,27 @@ export default class EventFormView extends AbstractStatefulView {
   };
 
   #eventTypeChangeHandler = (evt) => {
-    evt.preventDefault();
-
     const newType = evt.target.value;
-
-    this._state = {
-      ...this._state,
-      type: newType,
-    };
 
     this.updateElement({
       type: newType,
       offers: []
     });
-
-    const toggle = this.element.querySelector('.event__type-toggle');
-    if (toggle) {
-      toggle.checked = false;
-    }
   };
 
-  #dueDateStartChangeHandler = ([userDate]) => {
+  #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
-      dueDateStart: userDate,
+      dateFrom: userDate,
     });
   };
 
-  #dueDateEndChangeHandler = ([userDate]) => {
+  #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
-      dueDateEnd: userDate,
+      dateTo: userDate,
     });
   };
 
   #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
-
     const destinationName = evt.target.value;
 
     const destinationData = this.#allDestinations.find(
@@ -221,18 +212,25 @@ export default class EventFormView extends AbstractStatefulView {
     }
   };
 
+  #priceChangeHandler = (evt) => {
+    const newPrice = parseFloat(evt.target.value);
+
+    if (!isNaN(newPrice) && newPrice >= 0) {
+      this.updateElement({
+        basePrice: newPrice,
+      });
+    }
+  };
+
   #offerChangeHandler = (evt) => {
     evt.preventDefault();
 
-    const checkbox = evt.target;
-    const offerId = checkbox.value;
+    const offerId = evt.target.value;
 
     let currentOffers = [...this._state.offers];
 
     if (evt.target.checked) {
-      if (!currentOffers.includes(offerId)) {
-        currentOffers.push(offerId);
-      }
+      currentOffers.push(offerId);
     } else {
       currentOffers = currentOffers.filter((id) => id !== offerId);
     }
@@ -251,8 +249,8 @@ export default class EventFormView extends AbstractStatefulView {
         startInput,
         {
           dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dueDateStart,
-          onChange: this.#dueDateStartChangeHandler,
+          defaultDate: this._state.dateFrom,
+          onChange: this.#dateFromChangeHandler,
           enableTime: true,
         },
       );
@@ -263,8 +261,8 @@ export default class EventFormView extends AbstractStatefulView {
         endInput,
         {
           dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dueDateEnd,
-          onChange: this.#dueDateEndChangeHandler,
+          defaultDate: this._state.dateTo,
+          onChange: this.#dateToChangeHandler,
           enableTime: true,
         },
       );
@@ -276,9 +274,9 @@ export default class EventFormView extends AbstractStatefulView {
       id: event.id,
       type: event.type,
       destination: event.destination,
-      dueDateStart: event.dueDateStart,
-      dueDateEnd: event.dueDateEnd,
-      price: event.price,
+      dateFrom: event.dateFrom,
+      dateTo: event.dateTo,
+      basePrice: event.basePrice,
       offers: event.offers,
       isFavorite: event.isFavorite
     };
@@ -289,9 +287,9 @@ export default class EventFormView extends AbstractStatefulView {
       id: state.id,
       type: state.type,
       destination: state.destination,
-      dueDateStart: state.dueDateStart,
-      dueDateEnd: state.dueDateEnd,
-      price: state.price,
+      dateFrom: state.dateFrom,
+      dateTo: state.dateTo,
+      basePrice: state.basePrice,
       offers: state.offers,
       isFavorite: state.isFavorite
     };
