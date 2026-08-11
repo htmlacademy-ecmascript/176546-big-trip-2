@@ -1,4 +1,4 @@
-import {TYPE, MIN_PRICE, MAX_PRICE, YEAR} from '../const.js';
+import {TYPE, MIN_BASE_PRICE, MAX_BASE_PRICE, YEAR} from '../const.js';
 import {getRandomArrayElement, generateTwoDates, getRandomNumber, getRandomBoolean} from '../util/utils.js';
 
 const createRandomEvent = (allOffers, destinations) => {
@@ -17,11 +17,11 @@ const createRandomEvent = (allOffers, destinations) => {
   return {
     id: id,
     type: type,
-    dueDateStart: dateStart,
-    dueDateEnd: dateEnd,
+    dateFrom: dateStart,
+    dateTo: dateEnd,
     destination: destination,
     isFavorite: getRandomBoolean(),
-    price: getRandomNumber(MIN_PRICE, MAX_PRICE),
+    basePrice: getRandomNumber(MIN_BASE_PRICE, MAX_BASE_PRICE),
     offers: eventOffers,
   };
 };

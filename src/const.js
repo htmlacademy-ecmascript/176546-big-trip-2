@@ -1,5 +1,5 @@
-const MIN_PRICE = 100;
-const MAX_PRICE = 1000;
+const MIN_BASE_PRICE = 100;
+const MAX_BASE_PRICE = 1000;
 const YEAR = 2026;
 const LINK_FOTO = 'https://loremflickr.com/248/152?random=';
 
@@ -220,13 +220,13 @@ const FilterType = {
 const SortType = {
   DAY: 'day',
   TIME: 'time',
-  PRICE: 'price',
+  price: 'price',
 };
 
 export {
   TYPE,
-  MIN_PRICE,
-  MAX_PRICE,
+  MIN_BASE_PRICE,
+  MAX_BASE_PRICE,
   DESCRIPTION,
   YEAR,
   LINK_FOTO,

@@ -1,13 +1,13 @@
 const sortEventDay = (eventA, eventB) =>
-  new Date(eventA.dueDateStart) - new Date(eventB.dueDateStart);
+  new Date(eventA.dateFrom) - new Date(eventB.dateFrom);
 
 const sortEventTime = (eventA, eventB) => {
-  const durationA = new Date(eventA.dueDateEnd) - new Date(eventA.dueDateStart);
-  const durationB = new Date(eventB.dueDateEnd) - new Date(eventB.dueDateStart);
+  const durationA = new Date(eventA.dateTo) - new Date(eventA.dateFrom);
+  const durationB = new Date(eventB.dateTo) - new Date(eventB.dateFrom);
   return durationB - durationA;
 };
 
-const sortEventPrice = (eventA, eventB) =>
-  eventB.price - eventA.price;
+const sortEventprice = (eventA, eventB) =>
+  eventB.basePrice - eventA.basePrice;
 
-export {sortEventDay, sortEventTime, sortEventPrice};
+export {sortEventDay, sortEventTime, sortEventprice};

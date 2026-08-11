@@ -6,18 +6,18 @@ const DATE_FORMAT = 'MMM D';
 const TIME_FORMAT = 'HH:mm';
 
 function createEventTemplate(event, allOffers, destination) {
-  const {type, dueDateStart, dueDateEnd, price, isFavorite} = event;
+  const {type, dateFrom, dateTo, basePrice, isFavorite} = event;
 
   const destinationName = destination.name;
 
-  const date = formatDate(dueDateStart);
-  const humanizeDate = humanizeEventDueDate(dueDateStart, DATE_FORMAT);
+  const date = formatDate(dateFrom);
+  const humanizeDate = humanizeEventDueDate(dateFrom, DATE_FORMAT);
 
-  const timeStart = formatDate(dueDateStart, {withTime: true});
-  const humanizeTimeStart = humanizeEventDueDate(dueDateStart, TIME_FORMAT);
+  const timeStart = formatDate(dateFrom, {withTime: true});
+  const humanizeTimeStart = humanizeEventDueDate(dateFrom, TIME_FORMAT);
 
-  const timeEnd = formatDate(dueDateEnd, {withTime: true});
-  const humanizeTimeEnd = humanizeEventDueDate(dueDateEnd, TIME_FORMAT);
+  const timeEnd = formatDate(dateTo, {withTime: true});
+  const humanizeTimeEnd = humanizeEventDueDate(dateTo, TIME_FORMAT);
 
   const duration = formatDateDiff(timeStart, timeEnd);
 
@@ -44,7 +44,7 @@ function createEventTemplate(event, allOffers, destination) {
           <p class="event__duration">${duration}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">

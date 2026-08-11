@@ -5,18 +5,18 @@ const isEventOverdue = (dueDate) => dueDate && dayjs(dueDate).isBefore(dayjs(), 
 
 const isEventUpcoming = (dueDate) => dueDate && dayjs(dueDate).isAfter(dayjs(), 'day');
 
-const isEventPresent = (dueDateStart, dueDateEnd) => {
+const isEventPresent = (dateFrom, dateTo) => {
   const now = dayjs();
 
-  return (now.isSame(dueDateStart, 'day') || now.isAfter(dueDateStart, 'day')) &&
-         (now.isSame(dueDateEnd, 'day') || now.isBefore(dueDateEnd, 'day'));
+  return (now.isSame(dateFrom, 'day') || now.isAfter(dateFrom, 'day')) &&
+         (now.isSame(dateTo, 'day') || now.isBefore(dateTo, 'day'));
 };
 
 const filter = {
   [FilterType.EVERYTHING]: ((events) => events),
-  [FilterType.FUTURE]: (events) => events.filter((event) => isEventUpcoming(event.dueDateStart)),
-  [FilterType.PRESENT]: (events) => events.filter((event) => isEventPresent(event.dueDateStart, event.dueDateEnd)),
-  [FilterType.PAST]: (events) => events.filter((event) => isEventOverdue(event.dueDateEnd)),
+  [FilterType.FUTURE]: (events) => events.filter((event) => isEventUpcoming(event.dateFrom)),
+  [FilterType.PRESENT]: (events) => events.filter((event) => isEventPresent(event.dateFrom, event.dateTo)),
+  [FilterType.PAST]: (events) => events.filter((event) => isEventOverdue(event.dateTo)),
 };
 
 function generateFilter(events) {
