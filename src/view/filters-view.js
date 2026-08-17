@@ -1,9 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {FilterType} from '../const.js';
 
-function createFilterItemTemplate(filter) {
+function createFilterItemTemplate(filter, currentFilterType) {
   const filterName = filter.type.toLowerCase();
-  const isChecked = filterName === FilterType.EVERYTHING ? 'checked' : '';
+  const isChecked = filterName === currentFilterType ? 'checked' : '';
   const isDisabled = filter.count === 0 ? 'disabled' : '';
 
   return `
@@ -27,9 +26,9 @@ function createFilterItemTemplate(filter) {
   `;
 }
 
-function createFilterTemplate(filters) {
+function createFilterTemplate(filters, currentFilterType) {
   const filterItems = filters
-    .map((filter) => createFilterItemTemplate(filter))
+    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
   return (
@@ -42,13 +41,28 @@ function createFilterTemplate(filters) {
 
 export default class FiltersView extends AbstractView {
   #filters = null;
+  #currenFilter = null;
+  #handleFilterTypeChange = null;
 
-  constructor({filters}) {
+  constructor({filters, currentFilterType, onFilterTypeChange}) {
     super();
     this.#filters = filters;
+    this.#currenFilter = currentFilterType;
+    this.#handleFilterTypeChange = onFilterTypeChange;
+
+    this.setEventListeners();
   }
 
   get template() {
-    return createFilterTemplate(this.#filters);
+    return createFilterTemplate(this.#filters, this.#currenFilter);
   }
+
+  setEventListeners() {
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  }
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFilterTypeChange(evt.target.value);
+  };
 }

@@ -12,7 +12,8 @@ const DATE_FORMAT = 'd/m/y H:i';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
 function createEventFormTemplate(event, allOffers, allDestinations) {
-  const destinationData = allDestinations.find((dest) => dest.id === event.destination);
+  const destinationData = allDestinations.find((dest) => dest.id === event.destination)
+    || { id: '', name: '', description: '', pictures: [] };
 
   const destinationSelectView = new DestinationSelectView({
     destination: destinationData.name,
@@ -93,14 +94,16 @@ export default class EventFormView extends AbstractStatefulView {
   #handlerFormClick = null;
   #datePickerStart = null;
   #datePickerEnd = null;
+  #handlerDeleteClick = null;
 
-  constructor({event, offers, destinations, onSubmit, onClick}) {
+  constructor({event, offers, destinations, onSubmit, onClick, onDeleteClick}) {
     super();
     this._setState(EventFormView.parseEventToState(event));
     this.#allOffers = offers;
     this.#allDestinations = destinations;
     this.#handleFormSubmit = onSubmit;
     this.#handlerFormClick = onClick;
+    this.#handlerDeleteClick = onDeleteClick;
 
     this._restoreHandlers();
   }
@@ -163,13 +166,22 @@ export default class EventFormView extends AbstractStatefulView {
       priceInput.addEventListener('change', this.#priceChangeHandler);
     }
 
+    const deleteBtn = this.element.querySelector('.event__reset-btn');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', this.#formDeleteClickHandler);
+    }
+
     this.#setDatePickers();
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
-    const eventData = EventFormView.parseStateToEvent(this._state);
-    this.#handleFormSubmit(eventData);
+    this.#handleFormSubmit(EventFormView.parseStateToEvent(this._state));
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerDeleteClick(EventFormView.parseStateToEvent(this._state));
   };
 
   #formClickHandler = (evt) => {

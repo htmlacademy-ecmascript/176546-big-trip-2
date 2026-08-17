@@ -21,12 +21,22 @@ export default class TripHeaderView extends AbstractView {
 
   constructor({ events, allOffers, allDestinations }) {
     super();
-    this.#events = events.sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
+    this.#events = events ? [...events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom)) : [];
     this.#allOffers = allOffers;
     this.#allDestinations = allDestinations;
   }
 
   get template() {
     return createTripHeaderTemplate(this.#events, this.#allOffers, this.#allDestinations);
+  }
+
+  update({events, allOffers, allDestinations}) {
+    this.#events = events ? [...events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom)) : [];
+    this.#allOffers = allOffers;
+    this.#allDestinations = allDestinations;
+
+    this.removeElement();
+
+    return this.element;
   }
 }

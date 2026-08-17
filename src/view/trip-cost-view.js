@@ -2,22 +2,20 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 function createTripCostTemplate(events, allOffers) {
   if (!events || events.length === 0) {
-    return `
-      <p class="trip-info__cost">
-        Total: &euro;&nbsp;<span class="trip-info__cost-value">0</span>
-      </p>
-    `;
+    return '<p class="trip-info__cost">Total: &euro;&nbsp;<span class="trip-info__cost-value">0</span></p>';
   }
 
   const totalCost = events.reduce((sum, event) => {
-    let eventTotal = event.basePrice;
-    const offerByType = allOffers.find((offer) => offer.type === event.type);
+    let eventTotal = event.basePrice || 0;
+    const offerByType = allOffers?.find((offer) => offer.type === event.type);
 
-    if (event.offers.length > 0) {
+    if (event.offers && event.offers.length > 0 && offerByType) {
       const offersTotal = event.offers.reduce((acc, offerId) => {
-        const totalprice = offerByType.offers.find((offer) => offer.id === offerId).price;
-
-        return acc + totalprice;
+        const offer = offerByType.offers?.find((o) => o.id === offerId);
+        if (offer) {
+          return acc + offer.price;
+        }
+        return acc;
       }, 0);
 
       eventTotal += offersTotal;

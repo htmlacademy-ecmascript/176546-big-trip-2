@@ -1,6 +1,7 @@
 import EventView from '../view/event-view.js';
 import {remove, render, replace} from '../framework/render.js';
 import EventFormView from '../view/event-form-view.js';
+import {UpdateType, UserAction} from '../const.js';
 
 const MODE = {
   DEFAULT: 'DEFAULT',
@@ -45,16 +46,24 @@ export default class EventPresenter {
     });
 
     this.#eventEditComponent = new EventFormView({
-      event,
+      event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
-        this.#handleDataChange(updatedEvent);
+        const updateType = this.#getUpdateType(updatedEvent);
+        this.#handleDataChange(
+          UserAction.UPDATE_EVENT,
+          updateType,
+          updatedEvent,
+        );
       },
       onClick: () => {
         this.#replaceFormToEvent();
-      }
+      },
+      onDeleteClick: () => {
+        this.#handleDeleteClick(this.#event);
+      },
     });
 
     if (prevEventComponent === null || prevEventEditComponent === null) {
@@ -86,31 +95,9 @@ export default class EventPresenter {
     }
   }
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.#replaceFormToEvent();
-    }
-  };
-
-  #replaceCardToForm() {
-    replace(this.#eventEditComponent, this.#eventComponent);
-    this.#handleModeChange();
-    this.#mode = MODE.EDITING;
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+  getMode() {
+    return this.#mode;
   }
-
-  #replaceFormToEvent() {
-    this.#eventEditComponent.reset(this.#event);
-
-    replace(this.#eventComponent, this.#eventEditComponent);
-    this.#mode = MODE.DEFAULT;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-  }
-
-  #handleFavoriteClick = () => {
-    this.#handleDataChange({...this.#event, isFavorite: !this.#event.isFavorite});
-  };
 
   update(event, offers, destination, destinations) {
     this.#event = event;
@@ -128,7 +115,11 @@ export default class EventPresenter {
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
-    replace(newEventComponent, this.#eventComponent);
+    if (this.#eventComponent && this.#eventComponent.element && this.#eventComponent.element.parentElement) {
+      replace(newEventComponent, this.#eventComponent);
+    } else {
+      render(newEventComponent, this.#eventListContainer);
+    }
     this.#eventComponent = newEventComponent;
 
     const newEventEditComponent = new EventFormView({
@@ -137,18 +128,100 @@ export default class EventPresenter {
       destinations: this.#destinations,
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
-        this.#handleDataChange(updatedEvent);
+        const updateType = this.#getUpdateType(updatedEvent);
+        this.#handleDataChange(
+          UserAction.UPDATE_EVENT,
+          updateType,
+          updatedEvent,
+        );
       },
       onClick: () => {
         this.#replaceFormToEvent();
-      }
+      },
+      onDeleteClick: () => {
+        this.#handleDeleteClick(this.#event);
+      },
     });
+
+    if (this.#eventEditComponent && this.#eventEditComponent.element && this.#eventEditComponent.element.parentElement) {
+      replace(newEventEditComponent, this.#eventEditComponent);
+    }
+    this.#eventEditComponent = newEventEditComponent;
+  }
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#replaceFormToEvent();
+    }
+  };
+
+  #replaceCardToForm() {
+    const newEventEditComponent = new EventFormView({
+      event: this.#event,
+      offers: this.#offers,
+      destinations: this.#destinations,
+      onSubmit: (updatedEvent) => {
+        this.#replaceFormToEvent();
+        const updateType = this.#getUpdateType(updatedEvent);
+        this.#handleDataChange(
+          UserAction.UPDATE_EVENT,
+          updateType,
+          updatedEvent,
+        );
+      },
+      onClick: () => {
+        this.#replaceFormToEvent();
+      },
+      onDeleteClick: () => {
+        this.#handleDeleteClick(this.#event);
+      },
+    });
+
+    if (this.#eventEditComponent) {
+      remove(this.#eventEditComponent);
+    }
 
     this.#eventEditComponent = newEventEditComponent;
 
-    if (this.#eventEditComponent && this.#eventEditComponent.element.parentNode) {
-      replace(newEventEditComponent, this.#eventEditComponent);
-      this.#eventEditComponent = newEventEditComponent;
-    }
+    replace(this.#eventEditComponent, this.#eventComponent);
+    this.#handleModeChange();
+    this.#mode = MODE.EDITING;
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  }
+
+  #replaceFormToEvent() {
+    replace(this.#eventComponent, this.#eventEditComponent);
+    this.#mode = MODE.DEFAULT;
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+  }
+
+  #handleFavoriteClick = () => {
+    this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      {...this.#event, isFavorite: !this.#event.isFavorite},
+    );
+  };
+
+  #handleDeleteClick = (event) => {
+    this.#handleDataChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MAJOR,
+      event,
+    );
+  };
+
+  #getUpdateType(updatedEvent) {
+    const oldEvent = this.#event;
+
+    const isMajorChange =
+      oldEvent.destination !== updatedEvent.destination ||
+      oldEvent.dateFrom !== updatedEvent.dateFrom ||
+      oldEvent.dateTo !== updatedEvent.dateTo ||
+      oldEvent.basePrice !== updatedEvent.basePrice ||
+      JSON.stringify(oldEvent.offers) !== JSON.stringify(updatedEvent.offers);
+
+    return isMajorChange ? UpdateType.MAJOR : UpdateType.MINOR;
   }
 }
