@@ -39,15 +39,17 @@ export default class BoardPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
+  setNewEventButtonView(view) {
+    this.#newEventButtonView = view;
+  }
+
   createNewEvent() {
-    // ✅ Сначала проверяем, есть ли уже открытая форма
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
 
     if (this.#newEventPresenter) {
       return;
     }
 
-    // ✅ Блокируем кнопку только если создаем новую форму
     if (this.#newEventButtonView) {
       this.#newEventButtonView.setDisabled(true);
     }
@@ -68,7 +70,6 @@ export default class BoardPresenter {
   #handleNewEventDestroy = () => {
     this.#newEventPresenter = null;
 
-    // ✅ Проверяем, есть ли открытые формы редактирования
     const hasEditing = Array.from(this.#eventPresenter.values()).some(
       (presenter) => presenter.getMode() === 'EDITING'
     );
@@ -79,15 +80,12 @@ export default class BoardPresenter {
   };
 
   #handleModeChange = () => {
-    // ✅ Проверяем режимы ДО сброса
     const hasEditing = Array.from(this.#eventPresenter.values()).some(
       (presenter) => presenter.getMode() === 'EDITING'
     );
 
-    // ✅ Сбрасываем режимы
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
 
-    // ✅ Блокируем кнопку
     if (this.#newEventButtonView) {
       this.#newEventButtonView.setDisabled(hasEditing || !!this.#newEventPresenter);
     }

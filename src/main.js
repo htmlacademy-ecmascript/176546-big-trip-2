@@ -27,12 +27,6 @@ const tripHeaderView = new TripHeaderView({
   allDestinations: destinationModel.destinations
 });
 
-const newEventButtonView = new NewEventButtonView({
-  onClick: () => {
-    boardPresenter.createNewEvent();
-  }
-});
-
 const boardPresenter = new BoardPresenter({
   boardContainer: tripEvents,
   eventsModel,
@@ -40,8 +34,15 @@ const boardPresenter = new BoardPresenter({
   offersModel,
   filterModel,
   tripHeaderView,
-  newEventButtonView
 });
+
+const newEventButtonView = new NewEventButtonView({
+  onClick: () => {
+    boardPresenter.createNewEvent();
+  }
+});
+
+boardPresenter.setNewEventButtonView(newEventButtonView);
 
 const filterPresenter = new FilterPresenter({
   filterContainer: tripControlsFilters,
