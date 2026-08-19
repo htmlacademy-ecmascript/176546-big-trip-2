@@ -2,7 +2,7 @@ import OffersFormView from './offers-form-view.js';
 import DestinationFormView from './destination-form-view.js';
 import DestinationSelectView from './destination-select-view.js';
 import EventTypesView from './event-types-view.js';
-import {humanizeEventDueDate} from '../util/utils.js';
+import { humanizeEventDueDate } from '../util/utils.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 
@@ -11,7 +11,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 const DATE_FORMAT = 'd/m/y H:i';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
 
-function createEventFormTemplate(event, allOffers, allDestinations) {
+function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
   const destinationData = allDestinations.find((dest) => dest.id === event.destination)
     || { id: '', name: '', description: '', pictures: [] };
 
@@ -39,6 +39,18 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
 
   const humanizeTimeStart = humanizeEventDueDate(event.dateFrom, TIME_FORMAT);
   const humanizeTimeEnd = humanizeEventDueDate(event.dateTo, TIME_FORMAT);
+
+
+  const buttonHtml = isNew
+    ? '<button class="event__reset-btn" type="reset">Cancel</button>'
+    : '<button class="event__reset-btn" type="reset">Delete</button>';
+
+  // ИЗМЕНЕНО: кнопка сворачивания только для существующих событий
+  const rollupButtonHtml = isNew
+    ? '' // Нет кнопки для новых событий
+    : `<button class="event__rollup-btn" type="button">
+        <span class="visually-hidden">Open event</span>
+       </button>`;
 
   return (
     `<li class="trip-events__item">
@@ -73,10 +85,8 @@ function createEventFormTemplate(event, allOffers, allDestinations) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${buttonHtml}
+          ${rollupButtonHtml}
         </header>
         <section class="event__details">
           ${offersView}
@@ -95,15 +105,28 @@ export default class EventFormView extends AbstractStatefulView {
   #datePickerStart = null;
   #datePickerEnd = null;
   #handlerDeleteClick = null;
+  #handlerCancelClick = null;
+  #isNew = false;
 
-  constructor({event, offers, destinations, onSubmit, onClick, onDeleteClick}) {
+  constructor({ event, offers, destinations, onSubmit, onClick, onDeleteClick, onCancel, isNew = false }) {
     super();
-    this._setState(EventFormView.parseEventToState(event));
+    const state = EventFormView.parseEventToState(event);
+
+    if (!event.dateFrom) {
+      state.dateFrom = null;
+    }
+    if (!event.dateTo) {
+      state.dateTo = null;
+    }
+
+    this._setState(state);
     this.#allOffers = offers;
     this.#allDestinations = destinations;
     this.#handleFormSubmit = onSubmit;
-    this.#handlerFormClick = onClick;
+    this.#handlerFormClick = onClick; // для кнопки сворачивания
     this.#handlerDeleteClick = onDeleteClick;
+    this.#handlerCancelClick = onCancel; // для кнопки Cancel
+    this.#isNew = isNew;
 
     this._restoreHandlers();
   }
@@ -112,7 +135,9 @@ export default class EventFormView extends AbstractStatefulView {
     return createEventFormTemplate(
       this._state,
       this.#allOffers,
-      this.#allDestinations);
+      this.#allDestinations,
+      this.#isNew // <-- передаем isNew в шаблон
+    );
   }
 
   removeElement() {
@@ -143,7 +168,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     const rollupBtn = this.element.querySelector('.event__rollup-btn');
     if (rollupBtn) {
-      rollupBtn.addEventListener('click', this.#formClickHandler);
+      rollupBtn.addEventListener('click', this.#rollupClickHandler);
     }
 
     const typeInputs = this.element.querySelectorAll('.event__type-input');
@@ -166,9 +191,13 @@ export default class EventFormView extends AbstractStatefulView {
       priceInput.addEventListener('change', this.#priceChangeHandler);
     }
 
-    const deleteBtn = this.element.querySelector('.event__reset-btn');
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', this.#formDeleteClickHandler);
+    const resetBtn = this.element.querySelector('.event__reset-btn');
+    if (resetBtn) {
+      if (this.#isNew) {
+        resetBtn.addEventListener('click', this.#cancelClickHandler);
+      } else {
+        resetBtn.addEventListener('click', this.#formDeleteClickHandler);
+      }
     }
 
     this.#setDatePickers();
@@ -189,9 +218,14 @@ export default class EventFormView extends AbstractStatefulView {
     this.#handlerDeleteClick(EventFormView.parseStateToEvent(this._state));
   };
 
-  #formClickHandler = (evt) => {
+  #rollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handlerFormClick();
+    this.#handlerFormClick?.();
+  };
+
+  #cancelClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handlerCancelClick?.();
   };
 
   #eventTypeChangeHandler = (evt) => {

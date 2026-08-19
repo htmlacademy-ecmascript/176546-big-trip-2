@@ -49,6 +49,7 @@ export default class EventPresenter {
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
+      isNew: false, // ДОБАВИТЬ
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
         const updateType = this.#getUpdateType(updatedEvent);
@@ -58,7 +59,10 @@ export default class EventPresenter {
           updatedEvent,
         );
       },
-      onClick: () => {
+      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
+        this.#replaceFormToEvent();
+      },
+      onCancel: () => { // ДОБАВИТЬ
         this.#replaceFormToEvent();
       },
       onDeleteClick: () => {
@@ -126,6 +130,7 @@ export default class EventPresenter {
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
+      isNew: false, // ДОБАВИТЬ
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
         const updateType = this.#getUpdateType(updatedEvent);
@@ -135,7 +140,10 @@ export default class EventPresenter {
           updatedEvent,
         );
       },
-      onClick: () => {
+      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
+        this.#replaceFormToEvent();
+      },
+      onCancel: () => { // ДОБАВИТЬ
         this.#replaceFormToEvent();
       },
       onDeleteClick: () => {
@@ -161,6 +169,7 @@ export default class EventPresenter {
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
+      isNew: false, // ДОБАВИТЬ
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
         const updateType = this.#getUpdateType(updatedEvent);
@@ -170,7 +179,10 @@ export default class EventPresenter {
           updatedEvent,
         );
       },
-      onClick: () => {
+      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
+        this.#replaceFormToEvent();
+      },
+      onCancel: () => { // ДОБАВИТЬ
         this.#replaceFormToEvent();
       },
       onDeleteClick: () => {
