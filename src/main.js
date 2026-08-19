@@ -1,10 +1,10 @@
 import BoardPresenter from './presenter/board-presenter.js';
+import HeaderPresenter from './presenter/header-presenter.js';
 import {render, RenderPosition} from './framework/render.js';
 import EventsModel from './model/event-model.js';
 import OffersModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import FilterModel from './model/filter-model.js';
-import TripHeaderView from './view/trip-header-view.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import NewEventButtonView from './view/new-event-button-view.js';
 
@@ -21,10 +21,11 @@ const eventsModel = new EventsModel({
   destinations: destinationModel.destinations
 });
 
-const tripHeaderView = new TripHeaderView({
-  events: eventsModel.events,
-  allOffers: offersModel.offers,
-  allDestinations: destinationModel.destinations
+const headerPresenter = new HeaderPresenter({
+  headerContainer: tripMain,
+  eventsModel,
+  destinationModel,
+  offersModel
 });
 
 const boardPresenter = new BoardPresenter({
@@ -33,7 +34,6 @@ const boardPresenter = new BoardPresenter({
   destinationModel,
   offersModel,
   filterModel,
-  tripHeaderView,
 });
 
 const newEventButtonView = new NewEventButtonView({
@@ -50,9 +50,8 @@ const filterPresenter = new FilterPresenter({
   eventsModel,
 });
 
-render(tripHeaderView, tripMain, RenderPosition.AFTERBEGIN);
 render(newEventButtonView, tripControls, RenderPosition.AFTEREND);
 
-
+headerPresenter.init();
 filterPresenter.init();
 boardPresenter.init();

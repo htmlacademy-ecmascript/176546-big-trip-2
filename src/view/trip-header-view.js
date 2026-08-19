@@ -30,7 +30,7 @@ export default class TripHeaderView extends AbstractView {
     return createTripHeaderTemplate(this.#events, this.#allOffers, this.#allDestinations);
   }
 
-  update({events, allOffers, allDestinations}) {
+  update({ events, allOffers, allDestinations }) {
     this.#events = events ? [...events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom)) : [];
     this.#allOffers = allOffers;
     this.#allDestinations = allDestinations;

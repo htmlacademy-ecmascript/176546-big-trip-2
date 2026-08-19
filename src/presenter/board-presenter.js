@@ -1,13 +1,12 @@
-import {render, remove, replace, RenderPosition} from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
-import {FilterType, SortType, UpdateType, UserAction} from '../const.js';
-import {sortEventDay, sortEventprice, sortEventTime} from '../util/sort.js';
-import {filter} from '../util/filter.js';
+import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
+import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
+import { filter } from '../util/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
-import TripHeaderView from '../view/trip-header-view.js';
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -23,16 +22,14 @@ export default class BoardPresenter {
   #filterModel = null;
   #emptyComponent = null;
   #newEventPresenter = null;
-  #tripHeaderView = null;
   #newEventButtonView = null;
 
-  constructor({boardContainer, eventsModel, destinationModel, offersModel, filterModel, tripHeaderView, newEventButtonView}) {
+  constructor({ boardContainer, eventsModel, destinationModel, offersModel, filterModel, newEventButtonView }) {
     this.#boardContainer = boardContainer;
     this.#eventsModel = eventsModel;
     this.#destinationModel = destinationModel;
     this.#offersModel = offersModel;
     this.#filterModel = filterModel;
-    this.#tripHeaderView = tripHeaderView;
     this.#newEventButtonView = newEventButtonView;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
@@ -150,30 +147,8 @@ export default class BoardPresenter {
 
   #handleMajorUpdate = () => {
     this.#currentSortType = SortType.DAY;
-    this.#updateHeader();
     this.#renderBoard();
   };
-
-  #updateHeader() {
-    if (this.#tripHeaderView) {
-      const allEvents = this.#eventsModel.events;
-      const oldHeader = this.#tripHeaderView;
-
-      const newHeader = new TripHeaderView({
-        events: allEvents,
-        allOffers: this.#offers,
-        allDestinations: this.#destinations
-      });
-
-      if (oldHeader.element && oldHeader.element.parentElement) {
-        replace(newHeader, oldHeader);
-      } else {
-        render(newHeader, this.#boardContainer.parentElement, RenderPosition.AFTERBEGIN);
-      }
-
-      this.#tripHeaderView = newHeader;
-    }
-  }
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
@@ -184,7 +159,6 @@ export default class BoardPresenter {
         this.#handleMinorUpdate();
         break;
       case UpdateType.MAJOR:
-        this.#currentSortType = SortType.DAY;
         this.#handleMajorUpdate();
         break;
     }
@@ -284,4 +258,3 @@ export default class BoardPresenter {
     return [...this.events].sort(sortFunction);
   }
 }
-
