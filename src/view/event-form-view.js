@@ -176,6 +176,11 @@ export default class EventFormView extends AbstractStatefulView {
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
+
+    if (!this.#validateDates()) {
+      return;
+    }
+
     this.#handleFormSubmit(EventFormView.parseStateToEvent(this._state));
   };
 
@@ -202,12 +207,24 @@ export default class EventFormView extends AbstractStatefulView {
     this.updateElement({
       dateFrom: userDate,
     });
+
+    if (this.#datePickerEnd && userDate) {
+      this.#datePickerEnd.set('minDate', userDate);
+    }
+
+    this.#validateDates();
   };
 
   #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
       dateTo: userDate,
     });
+
+    if (this.#datePickerStart && userDate) {
+      this.#datePickerStart.set('maxDate', userDate);
+    }
+
+    this.#validateDates();
   };
 
   #destinationChangeHandler = (evt) => {
@@ -252,6 +269,37 @@ export default class EventFormView extends AbstractStatefulView {
     });
   };
 
+  #validateDates() {
+    const dateFrom = this._state.dateFrom;
+    const dateTo = this._state.dateTo;
+    const saveButton = this.element?.querySelector('.event__save-btn');
+
+    if (!saveButton) {
+      return true;
+    }
+
+    if (!dateFrom || !dateTo) {
+      saveButton.disabled = false;
+      return true;
+    }
+
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+
+    if (fromDate > toDate) {
+      saveButton.disabled = true;
+      return false;
+    }
+
+    if (toDate < fromDate) {
+      saveButton.disabled = true;
+      return false;
+    }
+
+    saveButton.disabled = false;
+    return true;
+  }
+
   #setDatePickers() {
     const startInput = this.element.querySelector('#event-start-time-1');
     const endInput = this.element.querySelector('#event-end-time-1');
@@ -264,6 +312,11 @@ export default class EventFormView extends AbstractStatefulView {
           defaultDate: this._state.dateFrom,
           onChange: this.#dateFromChangeHandler,
           enableTime: true,
+          onOpen: () => {
+            if (this._state.dateTo) {
+              this.#datePickerStart.set('maxDate', new Date(this._state.dateTo));
+            }
+          }
         },
       );
     }
@@ -276,9 +329,24 @@ export default class EventFormView extends AbstractStatefulView {
           defaultDate: this._state.dateTo,
           onChange: this.#dateToChangeHandler,
           enableTime: true,
+          onOpen: () => {
+            if (this._state.dateFrom) {
+              this.#datePickerEnd.set('minDate', new Date(this._state.dateFrom));
+            }
+          }
         },
       );
     }
+
+    if (this._state.dateFrom && this.#datePickerEnd) {
+      this.#datePickerEnd.set('minDate', new Date(this._state.dateFrom));
+    }
+
+    if (this._state.dateTo && this.#datePickerStart) {
+      this.#datePickerStart.set('maxDate', new Date(this._state.dateTo));
+    }
+
+    this.#validateDates();
   }
 
   static parseEventToState(event) {

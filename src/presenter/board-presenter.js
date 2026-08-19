@@ -43,6 +43,22 @@ export default class BoardPresenter {
     this.#newEventButtonView = view;
   }
 
+  #getOrCreateEventListContainer() {
+    if (this.#eventListComponent && this.#eventListComponent.element) {
+      return this.#eventListComponent.element;
+    }
+
+    if (this.#emptyComponent) {
+      remove(this.#emptyComponent);
+      this.#emptyComponent = null;
+    }
+
+    this.#eventListComponent = new EventListView();
+    render(this.#eventListComponent, this.#boardContainer);
+
+    return this.#eventListComponent.element;
+  }
+
   createNewEvent() {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
 
@@ -54,7 +70,7 @@ export default class BoardPresenter {
       this.#newEventButtonView.setDisabled(true);
     }
 
-    const container = this.#eventListComponent ? this.#eventListComponent.element : this.#boardContainer;
+    const container = this.#getOrCreateEventListContainer();
 
     this.#newEventPresenter = new NewEventPresenter({
       eventListContainer: container,
@@ -120,6 +136,7 @@ export default class BoardPresenter {
 
   #handlePatchUpdate = (data) => {
     const presenter = this.#eventPresenter.get(data.id);
+
     if (presenter) {
       const destination = this.#destinationModel.getDestinationById(data.destination);
       presenter.update(data, this.#offers, destination, this.#destinations);
@@ -267,3 +284,4 @@ export default class BoardPresenter {
     return [...this.events].sort(sortFunction);
   }
 }
+
