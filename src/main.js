@@ -1,12 +1,10 @@
 import BoardPresenter from './presenter/board-presenter.js';
 import HeaderPresenter from './presenter/header-presenter.js';
-import {render, RenderPosition} from './framework/render.js';
 import EventsModel from './model/event-model.js';
 import OffersModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-import NewEventButtonView from './view/new-event-button-view.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripControls = document.querySelector('.trip-main__trip-controls');
@@ -34,23 +32,14 @@ const boardPresenter = new BoardPresenter({
   destinationModel,
   offersModel,
   filterModel,
+  buttonContainer: tripControls // <-- передаем контейнер для кнопки
 });
-
-const newEventButtonView = new NewEventButtonView({
-  onClick: () => {
-    boardPresenter.createNewEvent();
-  }
-});
-
-boardPresenter.setNewEventButtonView(newEventButtonView);
 
 const filterPresenter = new FilterPresenter({
   filterContainer: tripControlsFilters,
   filterModel,
   eventsModel,
 });
-
-render(newEventButtonView, tripControls, RenderPosition.AFTEREND);
 
 headerPresenter.init();
 filterPresenter.init();

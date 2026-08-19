@@ -1,4 +1,4 @@
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
@@ -7,6 +7,7 @@ import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
 import { filter } from '../util/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
+import NewEventButtonView from '../view/new-event-button-view.js';
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -23,21 +24,53 @@ export default class BoardPresenter {
   #emptyComponent = null;
   #newEventPresenter = null;
   #newEventButtonView = null;
+  #buttonContainer = null;
 
-  constructor({ boardContainer, eventsModel, destinationModel, offersModel, filterModel, newEventButtonView }) {
+  constructor({
+    boardContainer,
+    eventsModel,
+    destinationModel,
+    offersModel,
+    filterModel,
+    buttonContainer
+  }) {
     this.#boardContainer = boardContainer;
     this.#eventsModel = eventsModel;
     this.#destinationModel = destinationModel;
     this.#offersModel = offersModel;
     this.#filterModel = filterModel;
-    this.#newEventButtonView = newEventButtonView;
+    this.#buttonContainer = buttonContainer;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  setNewEventButtonView(view) {
-    this.#newEventButtonView = view;
+  init() {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+
+    // Создаем и рендерим кнопку
+    this.#renderNewEventButton();
+
+    this.#renderBoard();
+  }
+
+  #renderNewEventButton() {
+    if (this.#newEventButtonView) {
+      return;
+    }
+
+    this.#newEventButtonView = new NewEventButtonView({
+      onClick: () => {
+        this.createNewEvent();
+      }
+    });
+
+    render(
+      this.#newEventButtonView,
+      this.#buttonContainer,
+      RenderPosition.AFTEREND
+    );
   }
 
   #getOrCreateEventListContainer() {
@@ -109,13 +142,6 @@ export default class BoardPresenter {
     const events = this.#eventsModel.events;
 
     return filter[filterType](events);
-  }
-
-  init() {
-    this.#offers = this.#offersModel.offers;
-    this.#destinations = this.#destinationModel.destinations;
-
-    this.#renderBoard();
   }
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -256,5 +282,13 @@ export default class BoardPresenter {
 
     const sortFunction = sortFunctions[sortType] || sortEventDay;
     return [...this.events].sort(sortFunction);
+  }
+
+  destroy() {
+    if (this.#newEventButtonView) {
+      remove(this.#newEventButtonView);
+      this.#newEventButtonView = null;
+    }
+    this.#clearEventList();
   }
 }
