@@ -32,7 +32,7 @@ const boardPresenter = new BoardPresenter({
   destinationModel,
   offersModel,
   filterModel,
-  buttonContainer: tripControls // <-- передаем контейнер для кнопки
+  buttonContainer: tripControls
 });
 
 const filterPresenter = new FilterPresenter({

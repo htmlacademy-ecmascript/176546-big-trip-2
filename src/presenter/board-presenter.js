@@ -49,7 +49,6 @@ export default class BoardPresenter {
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
 
-    // Создаем и рендерим кнопку
     this.#renderNewEventButton();
 
     this.#renderBoard();
@@ -62,7 +61,7 @@ export default class BoardPresenter {
 
     this.#newEventButtonView = new NewEventButtonView({
       onClick: () => {
-        this.createNewEvent();
+        this.#createNewEvent();
       }
     });
 
@@ -89,7 +88,7 @@ export default class BoardPresenter {
     return this.#eventListComponent.element;
   }
 
-  createNewEvent() {
+  #createNewEvent() {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
 
     if (this.#newEventPresenter) {
@@ -107,7 +106,10 @@ export default class BoardPresenter {
       offers: this.#offers,
       destinations: this.#destinations,
       onDataChange: this.#handleViewAction,
-      onDestroy: this.#handleNewEventDestroy
+      onDestroy: this.#handleNewEventDestroy,
+      onEscape: () => {
+        this.#newEventPresenter?.destroy();
+      }
     });
 
     this.#newEventPresenter.init();
@@ -116,25 +118,13 @@ export default class BoardPresenter {
   #handleNewEventDestroy = () => {
     this.#newEventPresenter = null;
 
-    const hasEditing = Array.from(this.#eventPresenter.values()).some(
-      (presenter) => presenter.getMode() === 'EDITING'
-    );
-
     if (this.#newEventButtonView) {
-      this.#newEventButtonView.setDisabled(hasEditing);
+      this.#newEventButtonView.setDisabled(false);
     }
   };
 
   #handleModeChange = () => {
-    const hasEditing = Array.from(this.#eventPresenter.values()).some(
-      (presenter) => presenter.getMode() === 'EDITING'
-    );
-
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
-
-    if (this.#newEventButtonView) {
-      this.#newEventButtonView.setDisabled(hasEditing || !!this.#newEventPresenter);
-    }
   };
 
   get events() {

@@ -35,40 +35,8 @@ export default class EventPresenter {
     const prevEventComponent = this.#eventComponent;
     const prevEventEditComponent = this.#eventEditComponent;
 
-    this.#eventComponent = new EventView({
-      event: this.#event,
-      offers: this.#offers,
-      destination: this.#destination,
-      onRollupClick: () => {
-        this.#replaceCardToForm();
-      },
-      onFavoriteClick: this.#handleFavoriteClick,
-    });
-
-    this.#eventEditComponent = new EventFormView({
-      event: this.#event,
-      offers: this.#offers,
-      destinations: this.#destinations,
-      isNew: false, // ДОБАВИТЬ
-      onSubmit: (updatedEvent) => {
-        this.#replaceFormToEvent();
-        const updateType = this.#getUpdateType(updatedEvent);
-        this.#handleDataChange(
-          UserAction.UPDATE_EVENT,
-          updateType,
-          updatedEvent,
-        );
-      },
-      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
-        this.#replaceFormToEvent();
-      },
-      onCancel: () => { // ДОБАВИТЬ
-        this.#replaceFormToEvent();
-      },
-      onDeleteClick: () => {
-        this.#handleDeleteClick(this.#event);
-      },
-    });
+    this.#eventComponent = this.#createEventView();
+    this.#eventEditComponent = this.#createEventFormView();
 
     if (prevEventComponent === null || prevEventEditComponent === null) {
       render(this.#eventComponent, this.#eventListContainer);
@@ -87,6 +55,15 @@ export default class EventPresenter {
     remove(prevEventEditComponent);
   }
 
+  update(event, offers, destination, destinations) {
+    this.#event = event;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#destinations = destinations;
+
+    this.#updateComponents();
+  }
+
   destroy() {
     remove(this.#eventComponent);
     remove(this.#eventEditComponent);
@@ -99,17 +76,28 @@ export default class EventPresenter {
     }
   }
 
-  getMode() {
-    return this.#mode;
+  #updateComponents() {
+    const newEventComponent = this.#createEventView();
+
+    if (this.#eventComponent?.element?.parentElement) {
+      replace(newEventComponent, this.#eventComponent);
+    } else {
+      render(newEventComponent, this.#eventListContainer);
+    }
+    this.#eventComponent = newEventComponent;
+
+    if (this.#mode === MODE.EDITING && this.#eventEditComponent) {
+      const newEventEditComponent = this.#createEventFormView();
+
+      if (this.#eventEditComponent.element?.parentElement) {
+        replace(newEventEditComponent, this.#eventEditComponent);
+      }
+      this.#eventEditComponent = newEventEditComponent;
+    }
   }
 
-  update(event, offers, destination, destinations) {
-    this.#event = event;
-    this.#offers = offers;
-    this.#destination = destination;
-    this.#destinations = destinations;
-
-    const newEventComponent = new EventView({
+  #createEventView() {
+    return new EventView({
       event: this.#event,
       offers: this.#offers,
       destination: this.#destination,
@@ -118,19 +106,14 @@ export default class EventPresenter {
       },
       onFavoriteClick: this.#handleFavoriteClick,
     });
+  }
 
-    if (this.#eventComponent && this.#eventComponent.element && this.#eventComponent.element.parentElement) {
-      replace(newEventComponent, this.#eventComponent);
-    } else {
-      render(newEventComponent, this.#eventListContainer);
-    }
-    this.#eventComponent = newEventComponent;
-
-    const newEventEditComponent = new EventFormView({
+  #createEventFormView() {
+    return new EventFormView({
       event: this.#event,
       offers: this.#offers,
       destinations: this.#destinations,
-      isNew: false, // ДОБАВИТЬ
+      isNew: false,
       onSubmit: (updatedEvent) => {
         this.#replaceFormToEvent();
         const updateType = this.#getUpdateType(updatedEvent);
@@ -140,55 +123,27 @@ export default class EventPresenter {
           updatedEvent,
         );
       },
-      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
+      onClick: () => {
         this.#replaceFormToEvent();
       },
-      onCancel: () => { // ДОБАВИТЬ
+      onCancel: () => {
         this.#replaceFormToEvent();
       },
       onDeleteClick: () => {
         this.#handleDeleteClick(this.#event);
       },
     });
-
-    if (this.#eventEditComponent && this.#eventEditComponent.element && this.#eventEditComponent.element.parentElement) {
-      replace(newEventEditComponent, this.#eventEditComponent);
-    }
-    this.#eventEditComponent = newEventEditComponent;
   }
 
   #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#replaceFormToEvent();
     }
   };
 
   #replaceCardToForm() {
-    const newEventEditComponent = new EventFormView({
-      event: this.#event,
-      offers: this.#offers,
-      destinations: this.#destinations,
-      isNew: false, // ДОБАВИТЬ
-      onSubmit: (updatedEvent) => {
-        this.#replaceFormToEvent();
-        const updateType = this.#getUpdateType(updatedEvent);
-        this.#handleDataChange(
-          UserAction.UPDATE_EVENT,
-          updateType,
-          updatedEvent,
-        );
-      },
-      onClick: () => { // ИЗМЕНИТЬ: onClick вместо onRollupClick
-        this.#replaceFormToEvent();
-      },
-      onCancel: () => { // ДОБАВИТЬ
-        this.#replaceFormToEvent();
-      },
-      onDeleteClick: () => {
-        this.#handleDeleteClick(this.#event);
-      },
-    });
+    const newEventEditComponent = this.#createEventFormView();
 
     if (this.#eventEditComponent) {
       remove(this.#eventEditComponent);
