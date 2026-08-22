@@ -88,6 +88,11 @@ export default class BoardPresenter {
     return this.#eventListComponent.element;
   }
 
+  #resetFiltersAndSorting = () => {
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#currentSortType = SortType.DAY;
+  };
+
   #createNewEvent() {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
 
@@ -98,6 +103,8 @@ export default class BoardPresenter {
     if (this.#newEventButtonView) {
       this.#newEventButtonView.setDisabled(true);
     }
+
+    this.#resetFiltersAndSorting();
 
     const container = this.#getOrCreateEventListContainer();
 
@@ -138,7 +145,6 @@ export default class BoardPresenter {
     const actions = {
       [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(updateType, update),
       [UserAction.ADD_EVENT]: () => {
-        this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
         this.#eventsModel.addEvent(updateType, update);
       },
       [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(updateType, update),

@@ -2,6 +2,17 @@ import EventFormView from '../view/event-form-view.js';
 import { RenderPosition, remove, render } from '../framework/render.js';
 import { UserAction, UpdateType } from '../const.js';
 
+const BLANK_EVENT = {
+  id: crypto.randomUUID(),
+  type: 'flight',
+  destination: '',
+  dateFrom: null,
+  dateTo: null,
+  basePrice: 0,
+  offers: [],
+  isFavorite: false,
+};
+
 export default class NewEventPresenter {
   #eventListContainer = null;
   #handleDataChange = null;
@@ -11,9 +22,16 @@ export default class NewEventPresenter {
   #eventFormView = null;
   #offers = null;
   #destinations = null;
-  #emptyEvent = null;
 
-  constructor({ eventListContainer, offers, destinations, onDataChange, onDestroy, onEscape, onResetFilters }) {
+  constructor({
+    eventListContainer,
+    offers,
+    destinations,
+    onDataChange,
+    onDestroy,
+    onEscape,
+    onResetFilters
+  }) {
     this.#eventListContainer = eventListContainer;
     this.#offers = offers;
     this.#destinations = destinations;
@@ -28,19 +46,12 @@ export default class NewEventPresenter {
       return;
     }
 
-    this.#emptyEvent = {
-      id: crypto.randomUUID(),
-      type: 'flight',
-      destination: '',
-      dateFrom: null,
-      dateTo: null,
-      basePrice: 0,
-      offers: [],
-      isFavorite: false,
-    };
+    if (this.#handleResetFilters) {
+      this.#handleResetFilters();
+    }
 
     this.#eventFormView = new EventFormView({
-      event: this.#emptyEvent,
+      event: BLANK_EVENT,
       offers: this.#offers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
@@ -67,10 +78,6 @@ export default class NewEventPresenter {
   #handleFormSubmit = (event) => {
     if (!event.dateFrom || !event.dateTo) {
       return;
-    }
-
-    if (this.#handleResetFilters) {
-      this.#handleResetFilters();
     }
 
     this.#handleDataChange(
