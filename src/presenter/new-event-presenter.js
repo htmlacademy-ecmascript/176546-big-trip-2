@@ -7,18 +7,20 @@ export default class NewEventPresenter {
   #handleDataChange = null;
   #handleDestroy = null;
   #handleEscape = null;
+  #handleResetFilters = null;
   #eventFormView = null;
   #offers = null;
   #destinations = null;
   #emptyEvent = null;
 
-  constructor({ eventListContainer, offers, destinations, onDataChange, onDestroy, onEscape }) {
+  constructor({ eventListContainer, offers, destinations, onDataChange, onDestroy, onEscape, onResetFilters }) {
     this.#eventListContainer = eventListContainer;
     this.#offers = offers;
     this.#destinations = destinations;
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
     this.#handleEscape = onEscape;
+    this.#handleResetFilters = onResetFilters;
   }
 
   init() {
@@ -65,6 +67,10 @@ export default class NewEventPresenter {
   #handleFormSubmit = (event) => {
     if (!event.dateFrom || !event.dateTo) {
       return;
+    }
+
+    if (this.#handleResetFilters) {
+      this.#handleResetFilters();
     }
 
     this.#handleDataChange(
