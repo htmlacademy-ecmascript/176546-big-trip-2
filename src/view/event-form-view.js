@@ -40,14 +40,8 @@ function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
   const humanizeTimeStart = humanizeEventDueDate(event.dateFrom, TIME_FORMAT);
   const humanizeTimeEnd = humanizeEventDueDate(event.dateTo, TIME_FORMAT);
 
-
-  const buttonHtml = isNew
-    ? '<button class="event__reset-btn" type="reset">Cancel</button>'
-    : '<button class="event__reset-btn" type="reset">Delete</button>';
-
-  // ИЗМЕНЕНО: кнопка сворачивания только для существующих событий
   const rollupButtonHtml = isNew
-    ? '' // Нет кнопки для новых событий
+    ? ''
     : `<button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
        </button>`;
@@ -85,7 +79,7 @@ function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          ${buttonHtml}
+          <button class="event__reset-btn" type="reset">${isNew ? 'Cancel' : 'Delete'}</button>
           ${rollupButtonHtml}
         </header>
         <section class="event__details">
@@ -107,6 +101,7 @@ export default class EventFormView extends AbstractStatefulView {
   #handlerDeleteClick = null;
   #handlerCancelClick = null;
   #isNew = false;
+  #saveButton = null;
 
   constructor({ event, offers, destinations, onSubmit, onClick, onDeleteClick, onCancel, isNew = false }) {
     super();
@@ -123,9 +118,9 @@ export default class EventFormView extends AbstractStatefulView {
     this.#allOffers = offers;
     this.#allDestinations = destinations;
     this.#handleFormSubmit = onSubmit;
-    this.#handlerFormClick = onClick; // для кнопки сворачивания
+    this.#handlerFormClick = onClick;
     this.#handlerDeleteClick = onDeleteClick;
-    this.#handlerCancelClick = onCancel; // для кнопки Cancel
+    this.#handlerCancelClick = onCancel;
     this.#isNew = isNew;
 
     this._restoreHandlers();
@@ -136,7 +131,7 @@ export default class EventFormView extends AbstractStatefulView {
       this._state,
       this.#allOffers,
       this.#allDestinations,
-      this.#isNew // <-- передаем isNew в шаблон
+      this.#isNew
     );
   }
 
@@ -188,6 +183,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     const priceInput = this.element.querySelector('.event__input--price');
     if (priceInput) {
+      priceInput.addEventListener('input', this.#priceInputHandler);
       priceInput.addEventListener('change', this.#priceChangeHandler);
     }
 
@@ -199,6 +195,8 @@ export default class EventFormView extends AbstractStatefulView {
         resetBtn.addEventListener('click', this.#formDeleteClickHandler);
       }
     }
+
+    this.#saveButton = this.element.querySelector('.event__save-btn');
 
     this.#setDatePickers();
   }
@@ -275,12 +273,38 @@ export default class EventFormView extends AbstractStatefulView {
     }
   };
 
+  #priceInputHandler = (evt) => {
+    const value = evt.target.value;
+    const cleanedValue = value.replace(/[^0-9.,]/g, '');
+
+    if (value !== cleanedValue) {
+      evt.target.value = cleanedValue;
+    }
+  };
+
   #priceChangeHandler = (evt) => {
-    const newPrice = parseFloat(evt.target.value);
+    const rawValue = evt.target.value.replace(/,/g, '.');
+    const cleanValue = rawValue.replace(/[^0-9.]/g, '');
+
+    if (!cleanValue) {
+      evt.target.value = 0;
+      this.updateElement({
+        basePrice: 0,
+      });
+      return;
+    }
+
+    const newPrice = parseFloat(cleanValue);
 
     if (!isNaN(newPrice) && newPrice >= 0) {
+      evt.target.value = newPrice;
       this.updateElement({
         basePrice: newPrice,
+      });
+    } else {
+      evt.target.value = 0;
+      this.updateElement({
+        basePrice: 0,
       });
     }
   };
@@ -306,31 +330,26 @@ export default class EventFormView extends AbstractStatefulView {
   #validateDates() {
     const dateFrom = this._state.dateFrom;
     const dateTo = this._state.dateTo;
-    const saveButton = this.element?.querySelector('.event__save-btn');
-
-    if (!saveButton) {
-      return true;
-    }
 
     if (!dateFrom || !dateTo) {
-      saveButton.disabled = false;
-      return true;
+      this.#saveButton.disabled = true;
+      return false;
     }
 
     const fromDate = new Date(dateFrom);
     const toDate = new Date(dateTo);
 
-    if (fromDate > toDate) {
-      saveButton.disabled = true;
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+      this.#saveButton.disabled = true;
       return false;
     }
 
-    if (toDate < fromDate) {
-      saveButton.disabled = true;
+    if (fromDate >= toDate) {
+      this.#saveButton.disabled = true;
       return false;
     }
 
-    saveButton.disabled = false;
+    this.#saveButton.disabled = false;
     return true;
   }
 

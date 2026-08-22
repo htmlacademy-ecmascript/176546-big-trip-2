@@ -10,6 +10,7 @@ export default class NewEventPresenter {
   #eventFormView = null;
   #offers = null;
   #destinations = null;
+  #emptyEvent = null;
 
   constructor({ eventListContainer, offers, destinations, onDataChange, onDestroy, onEscape }) {
     this.#eventListContainer = eventListContainer;
@@ -25,7 +26,7 @@ export default class NewEventPresenter {
       return;
     }
 
-    const emptyEvent = {
+    this.#emptyEvent = {
       id: crypto.randomUUID(),
       type: 'flight',
       destination: '',
@@ -37,7 +38,7 @@ export default class NewEventPresenter {
     };
 
     this.#eventFormView = new EventFormView({
-      event: emptyEvent,
+      event: this.#emptyEvent,
       offers: this.#offers,
       destinations: this.#destinations,
       onSubmit: this.#handleFormSubmit,
