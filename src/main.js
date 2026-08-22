@@ -1,38 +1,46 @@
-import FiltersView from './view/filters-view.js';
 import BoardPresenter from './presenter/board-presenter.js';
-import {render, RenderPosition} from './framework/render.js';
+import HeaderPresenter from './presenter/header-presenter.js';
 import EventsModel from './model/event-model.js';
 import OffersModel from './model/offer-model.js';
 import DestinationModel from './model/destination-model.js';
-import TripHeaderView from './view/trip-header-view.js';
-import {generateFilter} from './util/filter.js';
+import FilterModel from './model/filter-model.js';
+import FilterPresenter from './presenter/filter-presenter.js';
 
 const tripMain = document.querySelector('.trip-main');
+const tripControls = document.querySelector('.trip-main__trip-controls');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
 
 const offersModel = new OffersModel();
 const destinationModel = new DestinationModel();
+const filterModel = new FilterModel();
 const eventsModel = new EventsModel({
   offers: offersModel.offers,
   destinations: destinationModel.destinations
+});
+
+const headerPresenter = new HeaderPresenter({
+  headerContainer: tripMain,
+  eventsModel,
+  destinationModel,
+  offersModel
 });
 
 const boardPresenter = new BoardPresenter({
   boardContainer: tripEvents,
   eventsModel,
   destinationModel,
-  offersModel
+  offersModel,
+  filterModel,
+  buttonContainer: tripControls
 });
 
-const tripHeaderView = new TripHeaderView({
-  events: eventsModel.events,
-  allOffers: offersModel.offers,
-  allDestinations: destinationModel });
+const filterPresenter = new FilterPresenter({
+  filterContainer: tripControlsFilters,
+  filterModel,
+  eventsModel,
+});
 
-const filters = generateFilter(eventsModel.events);
-
-render(tripHeaderView, tripMain, RenderPosition.AFTERBEGIN);
-render(new FiltersView({filters}), tripControlsFilters);
-
+headerPresenter.init();
+filterPresenter.init();
 boardPresenter.init();

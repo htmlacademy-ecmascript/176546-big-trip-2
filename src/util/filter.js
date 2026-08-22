@@ -28,4 +28,4 @@ function generateFilter(events) {
   );
 }
 
-export {generateFilter};
+export {generateFilter, filter};

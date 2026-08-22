@@ -8,7 +8,7 @@ const TIME_FORMAT = 'HH:mm';
 function createEventTemplate(event, allOffers, destination) {
   const {type, dateFrom, dateTo, basePrice, isFavorite} = event;
 
-  const destinationName = destination.name;
+  const destinationName = destination?.name || 'Unknown';
 
   const date = formatDate(dateFrom);
   const humanizeDate = humanizeEventDueDate(dateFrom, DATE_FORMAT);
@@ -74,28 +74,37 @@ export default class EventView extends AbstractView {
   constructor({event, offers, destination, onRollupClick, onFavoriteClick}) {
     super();
     this.#event = event;
-    this.#offers = offers;
-    this.#destination = destination;
+    this.#offers = offers || [];
+    this.#destination = destination || { name: 'Unknown' };
     this.#handleRollupClick = onRollupClick;
     this.#handleFavoriteClick = onFavoriteClick;
 
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#clickHandler);
-    this.element.querySelector('.event__favorite-btn')
-      .addEventListener('click', this.#FavoriteClickHandler);
+    this.#restoreHandlers();
   }
 
   get template() {
     return createEventTemplate(this.#event, this.#offers, this.#destination);
   }
 
-  #clickHandler = (evt) => {
+  #restoreHandlers() {
+    const rollupBtn = this.element.querySelector('.event__rollup-btn');
+    if (rollupBtn) {
+      rollupBtn.addEventListener('click', this.#rollupClickHandler);
+    }
+
+    const favoriteBtn = this.element.querySelector('.event__favorite-btn');
+    if (favoriteBtn) {
+      favoriteBtn.addEventListener('click', this.#favoriteClickHandler);
+    }
+  }
+
+  #rollupClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleRollupClick();
+    this.#handleRollupClick?.();
   };
 
-  #FavoriteClickHandler = (evt) => {
+  #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFavoriteClick();
+    this.#handleFavoriteClick?.();
   };
 }

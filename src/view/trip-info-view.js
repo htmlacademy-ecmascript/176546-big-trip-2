@@ -35,18 +35,32 @@ export default class TripInfoView extends AbstractView {
       return 'No destinations';
     }
 
-    const destinationIds = this.#events.map((event) => event.destination);
-    const destinations = this.#allDestinations.destinations.filter((dest) => destinationIds.includes(dest.id));
+    // ✅ Сортируем события по дате
+    const sortedEvents = [...this.#events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
 
-    const destinationNames = destinations.map((dest) => dest.name);
+    // ✅ Получаем ID назначений в правильном порядке
+    const destinationIds = sortedEvents.map((event) => event.destination);
+
+    // ✅ Убираем дубликаты, сохраняя порядок
+    const uniqueNames = [];
+    const seen = new Set();
+
+    for (const id of destinationIds) {
+      if (!seen.has(id)) {
+        seen.add(id);
+        const dest = this.#allDestinations.find((d) => d.id === id);
+        if (dest) {
+          uniqueNames.push(dest.name);
+        }
+      }
+    }
 
     let result = '';
-    if (destinationNames.length <= MAX_VISIBLE_CITIES) {
-      result = destinationNames.join(' &mdash; ');
+    if (uniqueNames.length <= MAX_VISIBLE_CITIES) {
+      result = uniqueNames.join(' &mdash; ');
     } else {
-      const firstCity = destinationNames[0];
-      const lastCity = destinationNames.at(-1);
-
+      const firstCity = uniqueNames[0];
+      const lastCity = uniqueNames.at(-1);
       result = `${firstCity} &mdash; ... &mdash; ${lastCity}`;
     }
 
