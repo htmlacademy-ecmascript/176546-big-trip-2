@@ -62,7 +62,7 @@ export default class EventsModel extends Observable {
       this.#events.push(adaptedEvent);
       this._notify(UpdateType.MINOR, adaptedEvent);
     } catch(err) {
-      throw new Error('Не удалось добавить событие');
+      throw new Error('Can`t add event');
     }
   }
 
@@ -75,7 +75,7 @@ export default class EventsModel extends Observable {
         this._notify(UpdateType.MINOR, deletedEvent);
       }
     } catch(err) {
-      throw new Error('Не удалось удалить событие');
+      throw new Error('Can`t delete event');
     }
   }
 
