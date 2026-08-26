@@ -159,11 +159,9 @@ export default class BoardPresenter {
 
   #handleViewAction = (actionType, updateType, update) => {
     const actions = {
-      [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(update, updateType),
-      [UserAction.ADD_EVENT]: () => {
-        this.#eventsModel.addEvent(update, updateType);
-      },
-      [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(updateType, update),
+      [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(update),
+      [UserAction.ADD_EVENT]: () => this.#eventsModel.addEvent(update),
+      [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(update.id),
     };
 
     actions[actionType]?.();

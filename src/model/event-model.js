@@ -60,7 +60,7 @@ export default class EventsModel extends Observable {
       const newEvent = await this.#eventsApiService.addEvent(event);
       const adaptedEvent = this.#adaptToClient(newEvent);
       this.#events.push(adaptedEvent);
-      this._notify(UpdateType.MINOR, adaptedEvent);
+      this._notify(UpdateType.MAJOR, adaptedEvent);
     } catch(err) {
       throw new Error('Can`t add event');
     }
@@ -72,7 +72,7 @@ export default class EventsModel extends Observable {
       const index = this.#events.findIndex((event) => event.id === id);
       if (index !== -1) {
         const deletedEvent = this.#events.splice(index, 1)[0];
-        this._notify(UpdateType.MINOR, deletedEvent);
+        this._notify(UpdateType.MAJOR, deletedEvent);
       }
     } catch(err) {
       throw new Error('Can`t delete event');

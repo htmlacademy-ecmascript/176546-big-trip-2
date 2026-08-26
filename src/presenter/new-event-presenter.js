@@ -3,7 +3,6 @@ import { RenderPosition, remove, render } from '../framework/render.js';
 import { UserAction, UpdateType } from '../const.js';
 
 const BLANK_EVENT = {
-  id: crypto.randomUUID(),
   type: 'flight',
   destination: '',
   dateFrom: null,
@@ -80,10 +79,13 @@ export default class NewEventPresenter {
       return;
     }
 
+    const eventWithoutId = { ...event };
+    delete eventWithoutId.id;
+
     this.#handleDataChange(
       UserAction.ADD_EVENT,
       UpdateType.MAJOR,
-      event
+      eventWithoutId
     );
     this.destroy();
   };
