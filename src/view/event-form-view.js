@@ -10,6 +10,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const DATE_FORMAT = 'd/m/y H:i';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
   const destinationData = allDestinations.find((dest) => dest.id === event.destination)
@@ -115,6 +116,7 @@ export default class EventFormView extends AbstractStatefulView {
   #handlerCancelClick = null;
   #isNew = false;
   #saveButton = null;
+  #isShaking = false;
 
   constructor({ event, offers, destinations, onSubmit, onClick, onDeleteClick, onCancel, isNew = false }) {
     super();
@@ -166,6 +168,20 @@ export default class EventFormView extends AbstractStatefulView {
     this.updateElement(
       EventFormView.parseEventToState(event),
     );
+  }
+
+  shake() {
+    if (this.#isShaking) {
+      return;
+    }
+
+    this.#isShaking = true;
+    this.element.style.animation = 'shake 0.6s';
+
+    setTimeout(() => {
+      this.element.style.animation = '';
+      this.#isShaking = false;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _restoreHandlers() {

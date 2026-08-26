@@ -1,6 +1,7 @@
 import EventFormView from '../view/event-form-view.js';
 import { RenderPosition, remove, render } from '../framework/render.js';
 import { UserAction, UpdateType } from '../const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const BLANK_EVENT = {
   type: 'flight',
@@ -12,6 +13,11 @@ const BLANK_EVENT = {
   isFavorite: false,
 };
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export default class NewEventPresenter {
   #eventListContainer = null;
   #handleDataChange = null;
@@ -21,6 +27,7 @@ export default class NewEventPresenter {
   #eventFormView = null;
   #offers = null;
   #destinations = null;
+  #uiBlocker = null;
 
   constructor({
     eventListContainer,
@@ -38,6 +45,10 @@ export default class NewEventPresenter {
     this.#handleDestroy = onDestroy;
     this.#handleEscape = onEscape;
     this.#handleResetFilters = onResetFilters;
+    this.#uiBlocker = new UiBlocker({
+      lowerLimit: TimeLimit.LOWER_LIMIT,
+      upperLimit: TimeLimit.UPPER_LIMIT,
+    });
   }
 
   init() {
@@ -74,7 +85,7 @@ export default class NewEventPresenter {
     }
   };
 
-  #handleFormSubmit = (event) => {
+  #handleFormSubmit = async (event) => {
     if (!event.dateFrom || !event.dateTo) {
       return;
     }
@@ -82,12 +93,21 @@ export default class NewEventPresenter {
     const eventWithoutId = { ...event };
     delete eventWithoutId.id;
 
-    this.#handleDataChange(
-      UserAction.ADD_EVENT,
-      UpdateType.MAJOR,
-      eventWithoutId
-    );
-    this.destroy();
+    this.#uiBlocker.block();
+
+    try {
+      await this.#handleDataChange(
+        UserAction.ADD_EVENT,
+        UpdateType.MAJOR,
+        eventWithoutId
+      );
+      this.destroy();
+    } catch (error) {
+      this.#eventFormView?.updateElement({ isSaving: false, isDeleting: false });
+      this.#eventFormView?.shake();
+    } finally {
+      this.#uiBlocker.unblock();
+    }
   };
 
   #handleCancelClick = () => {

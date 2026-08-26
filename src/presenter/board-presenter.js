@@ -157,14 +157,14 @@ export default class BoardPresenter {
     return filter[filterType](events);
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
     const actions = {
       [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(update),
       [UserAction.ADD_EVENT]: () => this.#eventsModel.addEvent(update),
       [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(update.id),
     };
 
-    actions[actionType]?.();
+    await actions[actionType]?.();
   };
 
   #handlePatchUpdate = (data) => {
