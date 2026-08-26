@@ -2,14 +2,24 @@ import OfferView from './offer-view.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createOffersTemplate(event, allOffers) {
-  if (event.offers.length === 0) {
+  const safeOffers = Array.isArray(allOffers) ? allOffers : [];
+  const eventOffers = event.offers || [];
+
+  if (eventOffers.length === 0) {
     return '';
   }
 
-  const offerByType = allOffers.find((offer) => offer.type === event.type).offers;
+  const offerGroup = safeOffers.find((offer) => offer.type === event.type);
 
-  const currentOffers = offerByType.filter((offer) => event.offers.includes(offer.id));
+  if (!offerGroup) {
+    return '';
+  }
 
+  const currentOffers = offerGroup.offers.filter((offer) => eventOffers.includes(offer.id));
+
+  if (currentOffers.length === 0) {
+    return '';
+  }
 
   return currentOffers.map((offer) => {
     const offerView = new OfferView({ offer });
@@ -17,8 +27,8 @@ function createOffersTemplate(event, allOffers) {
   }).join('');
 }
 
-function createOffersSectionTemplate(offerIds, offers) {
-  const offersTemplate = createOffersTemplate(offerIds, offers);
+function createOffersSectionTemplate(event, offers) {
+  const offersTemplate = createOffersTemplate(event, offers);
 
   if (!offersTemplate) {
     return '';
@@ -38,7 +48,7 @@ export default class OffersView extends AbstractView {
   constructor({ event, offers }) {
     super();
     this.#event = event;
-    this.#offers = offers;
+    this.#offers = Array.isArray(offers) ? offers : [];
   }
 
   get template() {

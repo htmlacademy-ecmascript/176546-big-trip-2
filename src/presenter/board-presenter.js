@@ -2,6 +2,7 @@ import { render, remove, RenderPosition } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import EventPresenter from './event-presenter.js';
 import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
@@ -22,9 +23,11 @@ export default class BoardPresenter {
   #currentSortType = SortType.DAY;
   #filterModel = null;
   #emptyComponent = null;
+  #loadingComponent = null;
   #newEventPresenter = null;
   #newEventButtonView = null;
   #buttonContainer = null;
+  #isLoading = true;
 
   constructor({
     boardContainer,
@@ -43,15 +46,28 @@ export default class BoardPresenter {
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#offersModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
+    this.#isLoading = true;
 
     this.#renderNewEventButton();
-
     this.#renderBoard();
+  }
+
+  #renderLoading() {
+    this.#loadingComponent = new LoadingView();
+    render(this.#loadingComponent, this.#boardContainer);
+  }
+
+  #removeLoading() {
+    if (this.#loadingComponent) {
+      remove(this.#loadingComponent);
+      this.#loadingComponent = null;
+    }
   }
 
   #renderNewEventButton() {
@@ -143,9 +159,9 @@ export default class BoardPresenter {
 
   #handleViewAction = (actionType, updateType, update) => {
     const actions = {
-      [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(updateType, update),
+      [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(update, updateType),
       [UserAction.ADD_EVENT]: () => {
-        this.#eventsModel.addEvent(updateType, update);
+        this.#eventsModel.addEvent(update, updateType);
       },
       [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(updateType, update),
     };
@@ -158,7 +174,10 @@ export default class BoardPresenter {
 
     if (presenter) {
       const destination = this.#destinationModel.getDestinationById(data.destination);
-      presenter.update(data, this.#offers, destination, this.#destinations);
+      const offers = this.#offersModel.offers;
+      const destinations = this.#destinationModel.destinations;
+
+      presenter.update(data, offers, destination, destinations);
     }
   };
 
@@ -172,6 +191,13 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
+  #handleInitUpdate = () => {
+    this.#isLoading = false;
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+    this.#renderBoard();
+  };
+
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
@@ -182,6 +208,9 @@ export default class BoardPresenter {
         break;
       case UpdateType.MAJOR:
         this.#handleMajorUpdate();
+        break;
+      case UpdateType.INIT:
+        this.#handleInitUpdate();
         break;
     }
   };
@@ -208,18 +237,23 @@ export default class BoardPresenter {
     });
 
     const destination = this.#destinationModel.getDestinationById(event.destination);
+    const offers = this.#offersModel.offers;
+    const destinations = this.#destinationModel.destinations;
 
     eventPresenter.init({
       event,
-      offers: this.#offers,
+      offers: offers,
       destination: destination,
-      destinations: this.#destinations
+      destinations: destinations
     });
 
     this.#eventPresenter.set(event.id, eventPresenter);
   }
 
   #renderEventList() {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+
     const sortedEvents = this.#getSortedEvents(this.#currentSortType);
 
     sortedEvents.forEach((event) => {
@@ -250,10 +284,25 @@ export default class BoardPresenter {
       remove(this.#emptyComponent);
       this.#emptyComponent = null;
     }
+
+    if (this.#loadingComponent) {
+      remove(this.#loadingComponent);
+      this.#loadingComponent = null;
+    }
   }
 
   #renderBoard = () => {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+
     this.#clearEventList();
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    this.#removeLoading();
 
     if (this.events.length === 0) {
       this.#emptyComponent = new ListEmptyView(this.#filterModel.filter);
