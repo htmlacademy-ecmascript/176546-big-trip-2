@@ -1,7 +1,15 @@
-import {createRandomDestination} from '../mock/destination-mock.js';
-
 export default class DestinationModel {
-  #destinations = Array.from({length: 5}, createRandomDestination);
+  #destinationsApiService = null;
+  #destinations = [];
+
+  constructor({ destinationsApiService }) {
+    this.#destinationsApiService = destinationsApiService;
+  }
+
+  async init() {
+    this.#destinations = await this.#destinationsApiService.destinations;
+    return this.#destinations;
+  }
 
   get destinations() {
     return this.#destinations;

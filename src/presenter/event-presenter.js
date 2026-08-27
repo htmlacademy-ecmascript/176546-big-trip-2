@@ -2,10 +2,16 @@ import EventView from '../view/event-view.js';
 import {remove, render, replace} from '../framework/render.js';
 import EventFormView from '../view/event-form-view.js';
 import {UpdateType, UserAction} from '../const.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const MODE = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+};
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
 };
 
 export default class EventPresenter {
@@ -19,11 +25,16 @@ export default class EventPresenter {
   #handleDataChange = null;
   #handleModeChange = null;
   #mode = MODE.DEFAULT;
+  #uiBlocker = null;
 
   constructor({eventListContainer, onDataChange, onModeChange}) {
     this.#eventListContainer = eventListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#uiBlocker = new UiBlocker({
+      lowerLimit: TimeLimit.LOWER_LIMIT,
+      upperLimit: TimeLimit.UPPER_LIMIT,
+    });
   }
 
   init({event, offers, destination, destinations}) {
@@ -94,22 +105,41 @@ export default class EventPresenter {
     });
   }
 
-  #handleFormSubmit = (updatedEvent) => {
-    this.#replaceFormToEvent();
-    const updateType = this.#getUpdateType(updatedEvent);
-    this.#handleDataChange(
-      UserAction.UPDATE_EVENT,
-      updateType,
-      updatedEvent,
-    );
+  #handleFormSubmit = async (updatedEvent) => {
+    this.#uiBlocker.block();
+
+    try {
+      const updateType = this.#getUpdateType(updatedEvent);
+      await this.#handleDataChange(
+        UserAction.UPDATE_EVENT,
+        updateType,
+        updatedEvent,
+      );
+      this.#replaceFormToEvent();
+    } catch (error) {
+      this.#eventEditComponent?.updateElement({ isSaving: false, isDeleting: false });
+      this.#eventEditComponent?.shake();
+    } finally {
+      this.#uiBlocker.unblock();
+    }
   };
 
-  #handleDeleteClick = (event) => {
-    this.#handleDataChange(
-      UserAction.DELETE_EVENT,
-      UpdateType.MAJOR,
-      event,
-    );
+  #handleDeleteClick = async (event) => {
+    this.#uiBlocker.block();
+
+    try {
+      await this.#handleDataChange(
+        UserAction.DELETE_EVENT,
+        UpdateType.MAJOR,
+        event,
+      );
+      this.#replaceFormToEvent();
+    } catch (error) {
+      this.#eventEditComponent?.updateElement({ isSaving: false, isDeleting: false });
+      this.#eventEditComponent?.shake();
+    } finally {
+      this.#uiBlocker.unblock();
+    }
   };
 
   #escKeyDownHandler = (evt) => {
@@ -135,6 +165,10 @@ export default class EventPresenter {
   }
 
   #replaceFormToEvent = () => {
+    if (!this.#eventComponent || !this.#eventEditComponent) {
+      return;
+    }
+
     replace(this.#eventComponent, this.#eventEditComponent);
     this.#mode = MODE.DEFAULT;
     document.removeEventListener('keydown', this.#escKeyDownHandler);

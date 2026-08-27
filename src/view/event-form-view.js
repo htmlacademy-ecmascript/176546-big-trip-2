@@ -10,6 +10,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const DATE_FORMAT = 'd/m/y H:i';
 const TIME_FORMAT = 'DD/MM/YY HH:mm';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
   const destinationData = allDestinations.find((dest) => dest.id === event.destination)
@@ -46,6 +47,19 @@ function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
         <span class="visually-hidden">Open event</span>
        </button>`;
 
+  const saveButtonText = event.isSaving ? 'Saving...' : 'Save';
+  const saveButtonDisabled = event.isSaving ? 'disabled' : '';
+
+  let resetButtonText = 'Delete';
+  let resetButtonDisabled = '';
+
+  if (isNew) {
+    resetButtonText = 'Cancel';
+  } else if (event.isDeleting) {
+    resetButtonText = 'Deleting...';
+    resetButtonDisabled = 'disabled';
+  }
+
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -78,8 +92,8 @@ function createEventFormTemplate(event, allOffers, allDestinations, isNew) {
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${event.basePrice}">
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${isNew ? 'Cancel' : 'Delete'}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit" ${saveButtonDisabled}>${saveButtonText}</button>
+          <button class="event__reset-btn" type="reset" ${resetButtonDisabled}>${resetButtonText}</button>
           ${rollupButtonHtml}
         </header>
         <section class="event__details">
@@ -102,6 +116,7 @@ export default class EventFormView extends AbstractStatefulView {
   #handlerCancelClick = null;
   #isNew = false;
   #saveButton = null;
+  #isShaking = false;
 
   constructor({ event, offers, destinations, onSubmit, onClick, onDeleteClick, onCancel, isNew = false }) {
     super();
@@ -155,6 +170,20 @@ export default class EventFormView extends AbstractStatefulView {
     );
   }
 
+  shake() {
+    if (this.#isShaking) {
+      return;
+    }
+
+    this.#isShaking = true;
+    this.element.style.animation = 'shake 0.6s';
+
+    setTimeout(() => {
+      this.element.style.animation = '';
+      this.#isShaking = false;
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
   _restoreHandlers() {
     const form = this.element.querySelector('form');
     if (form) {
@@ -204,15 +233,28 @@ export default class EventFormView extends AbstractStatefulView {
   #formSaveHandler = (evt) => {
     evt.preventDefault();
 
-    if (!this.#validateDates()) {
+    if (!this.#validateDates() || this._state.isSaving) {
       return;
     }
+
+    this.updateElement({
+      isSaving: true,
+    });
 
     this.#handleFormSubmit(EventFormView.parseStateToEvent(this._state));
   };
 
   #formDeleteClickHandler = (evt) => {
     evt.preventDefault();
+
+    if (this._state.isDeleting) {
+      return;
+    }
+
+    this.updateElement({
+      isDeleting: true,
+    });
+
     this.#handlerDeleteClick(EventFormView.parseStateToEvent(this._state));
   };
 
@@ -411,7 +453,9 @@ export default class EventFormView extends AbstractStatefulView {
       dateTo: event.dateTo,
       basePrice: event.basePrice,
       offers: event.offers,
-      isFavorite: event.isFavorite
+      isFavorite: event.isFavorite,
+      isSaving: false,
+      isDeleting: false,
     };
   }
 
@@ -424,7 +468,7 @@ export default class EventFormView extends AbstractStatefulView {
       dateTo: state.dateTo,
       basePrice: state.basePrice,
       offers: state.offers,
-      isFavorite: state.isFavorite
+      isFavorite: state.isFavorite,
     };
   }
 }
