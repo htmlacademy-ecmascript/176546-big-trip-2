@@ -10,26 +10,14 @@ export default class OffersModel extends Observable {
     this.#offersApiService = offersApiService;
   }
 
-  #adaptToClient(offer) {
-    return {
-      type: offer.type,
-      offers: offer.offers.map((item) => ({
-        id: item.id,
-        title: item.title,
-        price: item.price
-      }))
-    };
-  }
-
   async init() {
     try {
-      const rawOffers = await this.#offersApiService.offers;
-      this.#offers = rawOffers.map(this.#adaptToClient);
+      this.#offers = await this.#offersApiService.offers;
       this._notify(UpdateType.INIT, this.#offers);
       return this.#offers;
     } catch(error) {
       this.#offers = [];
-      this._notify(UpdateType.INIT, this.#offers);
+      this._notify(UpdateType.INIT_ERROR, null);
       return this.#offers;
     }
   }

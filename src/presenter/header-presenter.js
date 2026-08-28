@@ -1,5 +1,6 @@
 import { render, replace, remove, RenderPosition } from '../framework/render.js';
 import TripHeaderView from '../view/trip-header-view.js';
+import { UpdateType } from '../const.js';
 
 export default class HeaderPresenter {
   #headerContainer = null;
@@ -17,6 +18,8 @@ export default class HeaderPresenter {
     this.#offersModel = offersModel;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#destinationModel.addObserver(this.#handleModelEvent);
+    this.#offersModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -26,22 +29,26 @@ export default class HeaderPresenter {
     this.#renderHeader();
   }
 
-  #handleModelEvent = () => {
-    this.#updateHeader();
+  #handleModelEvent = (updateType) => {
+    if (
+      updateType === UpdateType.INIT ||
+      updateType === UpdateType.MAJOR ||
+      updateType === UpdateType.MINOR ||
+      updateType === UpdateType.PATCH
+    ) {
+      this.#updateHeader();
+    }
   };
 
   #renderHeader() {
     const allEvents = this.#eventsModel.events;
-
-    if (allEvents.length === 0) {
-      this.#clearHeader();
-      return;
-    }
+    const destinations = this.#destinations;
+    const offers = this.#offers;
 
     const newHeader = new TripHeaderView({
       events: allEvents,
-      allOffers: this.#offers,
-      allDestinations: this.#destinations
+      allOffers: offers,
+      allDestinations: destinations
     });
 
     if (this.#headerView) {
