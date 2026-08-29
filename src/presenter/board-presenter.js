@@ -160,6 +160,9 @@ export default class BoardPresenter {
 
   #handleModeChange = () => {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
+    if (this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+    }
   };
 
   get events() {
@@ -218,12 +221,12 @@ export default class BoardPresenter {
     this.#renderBoard();
   };
 
-  #handleInitUpdate = () => {
-    const offersLoaded = this.#offersModel.offers && this.#offersModel.offers.length > 0;
-    const destinationsLoaded = this.#destinationModel.destinations && this.#destinationModel.destinations.length > 0;
-    const eventsLoaded = this.#eventsModel.events && this.#eventsModel.events.length > 0;
+  #initCount = 0;
 
-    if (offersLoaded && destinationsLoaded && eventsLoaded) {
+  #handleInitUpdate = () => {
+    this.#initCount += 1;
+
+    if (this.#initCount >= 3) {
       this.#isLoading = false;
       this.#offers = this.#offersModel.offers;
       this.#destinations = this.#destinationModel.destinations;

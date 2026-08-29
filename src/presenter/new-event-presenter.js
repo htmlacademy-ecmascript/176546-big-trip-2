@@ -74,18 +74,23 @@ export default class NewEventPresenter {
     }
   };
 
-  #handleFormSubmit = (event) => {
+  #handleFormSubmit = async (event) => {
     if (!event.dateFrom || !event.dateTo) {
       return;
     }
 
-    this.#handleDataChange(
-      UserAction.ADD_EVENT,
-      UpdateType.MAJOR,
-      event,
-      this,
-    );
-    this.destroy();
+    try {
+      await this.#handleDataChange(
+        UserAction.ADD_EVENT,
+        UpdateType.MAJOR,
+        event,
+        this,
+      );
+      this.destroy();
+    } catch (error) {
+      // ФИКС: ошибка уже обработана в board (resetState + shake),
+      // не даём ей стать unhandled promise rejection; форма остаётся открытой
+    }
   };
 
   #handleCancelClick = () => {
