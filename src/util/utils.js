@@ -59,22 +59,18 @@ function formatDateDiff(date1, date2) {
   const hours = diff.hours();
   const minutes = diff.minutes();
 
+  const formattedDays = String(days).padStart(2, '0');
+  const formattedHours = String(hours).padStart(2, '0');
+  const formattedMinutes = String(minutes).padStart(2, '0');
+
   let result = '';
   if (days > 0) {
-    result += `${days}D `;
+    result += `${formattedDays}d `;
   }
 
-  if (hours > 0 || days > 0) {
-    result += `${hours}H `;
-  }
-
-  result += `${minutes}M`;
+  result += `${formattedHours}h ${formattedMinutes}m`;
 
   return result.trim();
-}
-
-function getRandomBoolean(probability = 0.5) {
-  return Math.random() < probability;
 }
 
 export {
@@ -86,5 +82,4 @@ export {
   humanizeEventDueDate,
   formatDate,
   formatDateDiff,
-  getRandomBoolean,
 };

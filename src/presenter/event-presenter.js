@@ -152,7 +152,9 @@ export default class EventPresenter {
       UserAction.UPDATE_EVENT,
       UpdateType.PATCH,
       {...this.#event, isFavorite: !this.#event.isFavorite},
-    );
+    ).catch(() => {
+      this.#eventComponent?.shake();
+    });
   };
 
   #getUpdateType(updatedEvent) {

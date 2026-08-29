@@ -42,7 +42,7 @@ export default class EventsModel extends Observable {
     return this.#events;
   }
 
-  async updateEvent(updatedEvent) {
+  async updateEvent(updateType, updatedEvent) {
     try {
       const response = await this.#eventsApiService.updateEvent(updatedEvent);
       const adaptedEvent = this.#adaptToClient(response);
@@ -54,7 +54,7 @@ export default class EventsModel extends Observable {
       );
 
       const index = this.#events.findIndex((event) => event.id === updatedEvent.id);
-      this._notify(UpdateType.PATCH, this.#events[index]);
+      this._notify(updateType, this.#events[index]);
       return this.#events[index];
     } catch(err) {
       throw new Error('Can`t update event');

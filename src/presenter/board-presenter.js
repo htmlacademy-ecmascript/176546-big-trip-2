@@ -176,7 +176,7 @@ export default class BoardPresenter {
       switch (actionType) {
         case UserAction.UPDATE_EVENT:
           presenter?.setSaving();
-          await this.#eventsModel.updateEvent(update);
+          await this.#eventsModel.updateEvent(updateType, update);
           break;
         case UserAction.ADD_EVENT:
           presenter?.setSaving();
