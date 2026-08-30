@@ -56,8 +56,6 @@ export default class BoardPresenter {
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#offersModel.addObserver(this.#handleModelEvent);
-    this.#destinationModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
@@ -179,7 +177,7 @@ export default class BoardPresenter {
       switch (actionType) {
         case UserAction.UPDATE_EVENT:
           presenter?.setSaving();
-          await this.#eventsModel.updateEvent(updateType, update);
+          await this.#eventsModel.updateEvent(update);
           break;
         case UserAction.ADD_EVENT:
           presenter?.setSaving();
@@ -212,26 +210,24 @@ export default class BoardPresenter {
   };
 
   #handleMinorUpdate = () => {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
     this.#currentSortType = SortType.DAY;
     this.#renderBoard();
   };
 
   #handleMajorUpdate = () => {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
     this.#currentSortType = SortType.DAY;
     this.#renderBoard();
   };
 
-  #initCount = 0;
-
   #handleInitUpdate = () => {
-    this.#initCount += 1;
-
-    if (this.#initCount >= 3) {
-      this.#isLoading = false;
-      this.#offers = this.#offersModel.offers;
-      this.#destinations = this.#destinationModel.destinations;
-      this.#renderBoard();
-    }
+    this.#isLoading = false;
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
+    this.#renderBoard();
   };
 
   #handleInitError = () => {

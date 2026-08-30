@@ -22,7 +22,7 @@ export default class EventsModel extends Observable {
       dateFrom: event.date_from ? new Date(event.date_from) : null,
       dateTo: event.date_to ? new Date(event.date_to) : null,
       basePrice: event.base_price,
-      offers: event.offers,
+      offers: event.offers || [],
       isFavorite: event.is_favorite || false
     };
   }
@@ -42,10 +42,16 @@ export default class EventsModel extends Observable {
     return this.#events;
   }
 
-  async updateEvent(updateType, updatedEvent) {
+  async updateEvent(updatedEvent) {
     try {
       const response = await this.#eventsApiService.updateEvent(updatedEvent);
       const adaptedEvent = this.#adaptToClient(response);
+
+      const oldEvent = this.#events.find((event) => event.id === updatedEvent.id);
+      const isDateChanged = oldEvent && (
+        oldEvent.dateFrom?.getTime() !== adaptedEvent.dateFrom?.getTime() ||
+        oldEvent.dateTo?.getTime() !== adaptedEvent.dateTo?.getTime()
+      );
 
       this.#events = this.#events.map((event) =>
         event.id === updatedEvent.id
@@ -54,7 +60,10 @@ export default class EventsModel extends Observable {
       );
 
       const index = this.#events.findIndex((event) => event.id === updatedEvent.id);
+
+      const updateType = isDateChanged ? UpdateType.MAJOR : UpdateType.PATCH;
       this._notify(updateType, this.#events[index]);
+
       return this.#events[index];
     } catch(err) {
       throw new Error('Can`t update event');

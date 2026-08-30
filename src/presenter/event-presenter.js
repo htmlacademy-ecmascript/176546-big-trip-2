@@ -94,35 +94,25 @@ export default class EventPresenter {
     });
   }
 
-  #handleFormSubmit = async (updatedEvent) => {
+  #handleFormSubmit = (updatedEvent) => {
     const updateType = this.#getUpdateType(updatedEvent);
-
-    try {
-      await this.#handleDataChange(
-        UserAction.UPDATE_EVENT,
-        updateType,
-        updatedEvent,
-        this,
-      );
-      this.#replaceFormToEvent();
-    } catch (error) {
-      // ФИКС: ошибка уже обработана в board (resetState + shake),
-      // не даём ей стать unhandled promise rejection; форма остаётся открытой
-    }
+    this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      updateType,
+      updatedEvent,
+      this,
+    );
+    this.#replaceFormToEvent();
   };
 
-  #handleDeleteClick = async (event) => {
-    try {
-      await this.#handleDataChange(
-        UserAction.DELETE_EVENT,
-        UpdateType.MAJOR,
-        event,
-        this,
-      );
-      this.#replaceFormToEvent();
-    } catch (error) {
-      // ФИКС: см. выше — форма остаётся открытой, точка не удаляется
-    }
+  #handleDeleteClick = (event) => {
+    this.#handleDataChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MAJOR,
+      event,
+      this,
+    );
+    this.#replaceFormToEvent();
   };
 
   #escKeyDownHandler = (evt) => {
@@ -162,9 +152,7 @@ export default class EventPresenter {
       UserAction.UPDATE_EVENT,
       UpdateType.PATCH,
       {...this.#event, isFavorite: !this.#event.isFavorite},
-    ).catch(() => {
-      this.#eventComponent?.shake();
-    });
+    );
   };
 
   #getUpdateType(updatedEvent) {
