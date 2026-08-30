@@ -22,9 +22,9 @@ export default class FilterPresenter {
     const events = this.#eventsModel.events;
     const filterTypes = [
       FilterType.EVERYTHING,
+      FilterType.FUTURE,
       FilterType.PRESENT,
       FilterType.PAST,
-      FilterType.FUTURE
     ];
 
     return filterTypes.map((type) => ({
