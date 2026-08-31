@@ -8,13 +8,14 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import EventsApiService from './api/events-api-service.js';
 import DestinationsApiService from './api/destinations-api-service.js';
 import OffersApiService from './api/offers-api-service.js';
+import {randomString} from './util/utils.js';
 
 const tripMain = document.querySelector('.trip-main');
 const tripControls = document.querySelector('.trip-main__trip-controls');
 const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
 
-const AUTHORIZATION = 'Basic leokonv';
+const AUTHORIZATION = `Basic ${randomString(10)}`;
 const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
 
 async function initApp() {
