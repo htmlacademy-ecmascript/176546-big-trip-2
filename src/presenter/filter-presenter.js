@@ -24,7 +24,7 @@ export default class FilterPresenter {
       FilterType.EVERYTHING,
       FilterType.FUTURE,
       FilterType.PRESENT,
-      FilterType.PAST,
+      FilterType.PAST
     ];
 
     return filterTypes.map((type) => ({

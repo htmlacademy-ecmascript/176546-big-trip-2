@@ -34,6 +34,7 @@ export default class BoardPresenter {
   #isLoading = true;
   #uiBlocker = null;
   #isError = false;
+  #skipNewEventRerender = false;
 
   constructor({
     boardContainer,
@@ -154,9 +155,19 @@ export default class BoardPresenter {
     if (this.#newEventButtonView) {
       this.#newEventButtonView.setDisabled(false);
     }
+
+    if (this.#skipNewEventRerender) {
+      this.#skipNewEventRerender = false;
+      return;
+    }
+
+    if (this.events.length === 0) {
+      this.#renderBoard();
+    }
   };
 
   #handleModeChange = () => {
+    this.#skipNewEventRerender = true;
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
     if (this.#newEventPresenter) {
       this.#newEventPresenter.destroy();
@@ -189,8 +200,8 @@ export default class BoardPresenter {
           break;
       }
     } catch (error) {
-      presenter?.resetState();
       presenter?.shake();
+      setTimeout(() => presenter?.resetState(), 600);
       throw error;
     } finally {
       this.#uiBlocker.unblock();

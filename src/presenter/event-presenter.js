@@ -94,25 +94,35 @@ export default class EventPresenter {
     });
   }
 
-  #handleFormSubmit = (updatedEvent) => {
+  #handleFormSubmit = async (updatedEvent) => {
     const updateType = this.#getUpdateType(updatedEvent);
-    this.#handleDataChange(
-      UserAction.UPDATE_EVENT,
-      updateType,
-      updatedEvent,
-      this,
-    );
-    this.#replaceFormToEvent();
+
+    try {
+      await this.#handleDataChange(
+        UserAction.UPDATE_EVENT,
+        updateType,
+        updatedEvent,
+        this,
+      );
+      this.#replaceFormToEvent();
+    } catch (error) {
+      // ФИКС: ошибка уже обработана в board (resetState + shake),
+      // не даём ей стать unhandled promise rejection; форма остаётся открытой
+    }
   };
 
-  #handleDeleteClick = (event) => {
-    this.#handleDataChange(
-      UserAction.DELETE_EVENT,
-      UpdateType.MAJOR,
-      event,
-      this,
-    );
-    this.#replaceFormToEvent();
+  #handleDeleteClick = async (event) => {
+    try {
+      await this.#handleDataChange(
+        UserAction.DELETE_EVENT,
+        UpdateType.MAJOR,
+        event,
+        this,
+      );
+      this.#replaceFormToEvent();
+    } catch (error) {
+      // ФИКС: см. выше — ошибка обработана в board, форма остаётся открытой
+    }
   };
 
   #escKeyDownHandler = (evt) => {
@@ -147,12 +157,17 @@ export default class EventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange(
-      UserAction.UPDATE_EVENT,
-      UpdateType.PATCH,
-      {...this.#event, isFavorite: !this.#event.isFavorite},
-    );
+  #handleFavoriteClick = async () => {
+    try {
+      await this.#handleDataChange(
+        UserAction.UPDATE_EVENT,
+        UpdateType.PATCH,
+        {...this.#event, isFavorite: !this.#event.isFavorite},
+        this,
+      );
+    } catch (error) {
+      // ФИКС: ошибка обработана в board (resetState + shake), не пробрасываем
+    }
   };
 
   #getUpdateType(updatedEvent) {
@@ -187,7 +202,9 @@ export default class EventPresenter {
   }
 
   shake() {
-    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+    if (this.#mode === MODE.DEFAULT) {
+      this.#eventComponent?.shake();
+    } else if (this.#eventEditComponent && this.#eventEditComponent.element) {
       this.#eventEditComponent.shake();
     }
   }

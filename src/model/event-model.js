@@ -38,6 +38,10 @@ export default class EventsModel extends Observable {
     }
   }
 
+  notifyInitError() {
+    this._notify(UpdateType.INIT_ERROR, null);
+  }
+
   get events() {
     return this.#events;
   }
@@ -66,7 +70,7 @@ export default class EventsModel extends Observable {
 
       return this.#events[index];
     } catch(err) {
-      throw new Error('Can`t update event');
+      throw new Error(`Can\`t update event: ${err && err.message}`);
     }
   }
 

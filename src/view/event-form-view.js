@@ -386,7 +386,7 @@ export default class EventFormView extends AbstractStatefulView {
       return false;
     }
 
-    if (fromDate >= toDate) {
+    if (fromDate > toDate) {
       this.#saveButton.disabled = true;
       return false;
     }

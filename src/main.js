@@ -56,7 +56,8 @@ async function initApp() {
   await Promise.all([
     offersModel.init(),
     destinationModel.init()])
-    .then(() => eventsModel.init());
+    .then(() => eventsModel.init())
+    .catch(() => eventsModel.notifyInitError());
 }
 
 initApp();
