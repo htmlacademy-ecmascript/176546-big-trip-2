@@ -1,8 +1,8 @@
-import { TYPE } from '../const.js';
+import { TYPES } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createEventTypesTemplate(currentType) {
-  return TYPE.map((type) => {
+  return TYPES.map((type) => {
     const isChecked = type === currentType ? 'checked' : '';
     const id = `event-type-${type}-1`;
 

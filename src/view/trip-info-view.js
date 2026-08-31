@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 
 const MAX_VISIBLE_CITIES = 3;
-const dateFormat = 'DD MMM';
+const DATE_FORMAT = 'DD MMM';
 
 function createTripInfoTemplate(tripDateData, tripCityData) {
   return `
@@ -37,20 +37,13 @@ export default class TripInfoView extends AbstractView {
 
     const sortedEvents = [...this.#events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
 
-    const destinationIds = sortedEvents.map((event) => event.destination);
-
-    const uniqueNames = [];
-    const seen = new Set();
-
-    for (const id of destinationIds) {
-      if (!seen.has(id)) {
-        seen.add(id);
-        const dest = this.#allDestinations.find((d) => d.id === id);
-        if (dest) {
-          uniqueNames.push(dest.name);
-        }
+    const uniqueNames = sortedEvents.reduce((acc, event) => {
+      const dest = this.#allDestinations.find((d) => d.id === event.destination);
+      if (dest && !acc.some((name) => name === dest.name)) {
+        acc.push(dest.name);
       }
-    }
+      return acc;
+    }, []);
 
     let result = '';
     if (uniqueNames.length <= MAX_VISIBLE_CITIES) {
@@ -70,12 +63,14 @@ export default class TripInfoView extends AbstractView {
     }
 
     const dates = this.#events
-      .map((event) => [event.dateFrom, event.dateTo])
-      .flat()
+      .reduce((acc, event) => {
+        acc.push(event.dateFrom, event.dateTo);
+        return acc;
+      }, [])
       .sort((a, b) => new Date(a) - new Date(b));
 
-    const startDate = dayjs(dates[0]).format(dateFormat);
-    const endDate = dayjs(dates.at(-1)).format(dateFormat);
+    const startDate = dayjs(dates[0]).format(DATE_FORMAT);
+    const endDate = dayjs(dates.at(-1)).format(DATE_FORMAT);
 
     return startDate === endDate ? startDate : `${startDate} &mdash; ${endDate}`;
   };

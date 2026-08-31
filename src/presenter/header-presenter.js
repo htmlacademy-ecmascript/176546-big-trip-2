@@ -29,6 +29,10 @@ export default class HeaderPresenter {
     this.#renderHeader();
   }
 
+  destroy() {
+    this.#clearHeader();
+  }
+
   #handleModelEvent = (updateType) => {
     if (
       updateType === UpdateType.INIT ||
@@ -77,9 +81,5 @@ export default class HeaderPresenter {
       remove(this.#headerView);
       this.#headerView = null;
     }
-  }
-
-  destroy() {
-    this.#clearHeader();
   }
 }

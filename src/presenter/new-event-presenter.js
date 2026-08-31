@@ -67,6 +67,29 @@ export default class NewEventPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  destroy() {
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+
+    if (this.#eventFormView) {
+      remove(this.#eventFormView);
+      this.#eventFormView = null;
+    }
+
+    this.#handleDestroy();
+  }
+
+  setSaving() {
+    this.#eventFormView?.updateElement({ isSaving: true });
+  }
+
+  resetState() {
+    this.#eventFormView?.updateElement({ isSaving: false, isDeleting: false });
+  }
+
+  shake() {
+    this.#eventFormView?.shake();
+  }
+
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
@@ -96,27 +119,4 @@ export default class NewEventPresenter {
   #handleCancelClick = () => {
     this.destroy();
   };
-
-  destroy() {
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-
-    if (this.#eventFormView) {
-      remove(this.#eventFormView);
-      this.#eventFormView = null;
-    }
-
-    this.#handleDestroy();
-  }
-
-  setSaving() {
-    this.#eventFormView?.updateElement({ isSaving: true });
-  }
-
-  resetState() {
-    this.#eventFormView?.updateElement({ isSaving: false, isDeleting: false });
-  }
-
-  shake() {
-    this.#eventFormView?.shake();
-  }
 }

@@ -423,41 +423,50 @@ export default class EventFormView extends AbstractStatefulView {
     return true;
   }
 
+  #createDatePicker(inputElement, defaultDate, onChange, config = {}) {
+    return flatpickr(
+      inputElement,
+      {
+        dateFormat: DATE_FORMAT,
+        defaultDate: defaultDate,
+        onChange: onChange,
+        enableTime: true,
+        ...config
+      }
+    );
+  }
+
   #setDatePickers() {
     const startInput = this.element.querySelector('#event-start-time-1');
     const endInput = this.element.querySelector('#event-end-time-1');
 
     if (startInput) {
-      this.#datePickerStart = flatpickr(
+      this.#datePickerStart = this.#createDatePicker(
         startInput,
+        this._state.dateFrom,
+        this.#dateFromChangeHandler,
         {
-          dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler,
-          enableTime: true,
           onOpen: () => {
             if (this._state.dateTo) {
               this.#datePickerStart.set('maxDate', new Date(this._state.dateTo));
             }
           }
-        },
+        }
       );
     }
 
     if (endInput) {
-      this.#datePickerEnd = flatpickr(
+      this.#datePickerEnd = this.#createDatePicker(
         endInput,
+        this._state.dateTo,
+        this.#dateToChangeHandler,
         {
-          dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dateTo,
-          onChange: this.#dateToChangeHandler,
-          enableTime: true,
           onOpen: () => {
             if (this._state.dateFrom) {
               this.#datePickerEnd.set('minDate', new Date(this._state.dateFrom));
             }
           }
-        },
+        }
       );
     }
 
