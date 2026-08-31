@@ -2,7 +2,7 @@ import OfferFormView from './offer-form-view.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createOffersTemplate(offers, offerIds) {
-  if (!offers || offers.length === 0) {
+  if (offers.length === 0) {
     return '';
   }
 
@@ -18,7 +18,7 @@ function createOffersTemplate(offers, offerIds) {
 }
 
 function createOffersSectionTemplate(offers, offerIds) {
-  if (!offers || offers.length === 0) {
+  if (offers.length === 0) {
     return '';
   }
 

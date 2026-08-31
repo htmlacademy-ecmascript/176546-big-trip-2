@@ -1,4 +1,4 @@
-const TYPE = [
+const TYPES = [
   'taxi',
   'bus',
   'train',
@@ -20,7 +20,7 @@ const FilterType = {
 const SortType = {
   DAY: 'day',
   TIME: 'time',
-  price: 'price',
+  PRICE: 'price',
 };
 
 const UserAction = {
@@ -45,7 +45,7 @@ const Method = {
 };
 
 export {
-  TYPE,
+  TYPES,
   FilterType,
   SortType,
   UserAction,

@@ -62,12 +62,39 @@ export default class EventPresenter {
   destroy() {
     remove(this.#eventComponent);
     remove(this.#eventEditComponent);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
   resetView() {
     if (this.#mode !== MODE.DEFAULT) {
       this.#eventEditComponent.reset(this.#event);
       this.#replaceFormToEvent();
+    }
+  }
+
+  setSaving() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isSaving: true });
+    }
+  }
+
+  setDeleting() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isDeleting: true });
+    }
+  }
+
+  resetState() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isSaving: false, isDeleting: false });
+    }
+  }
+
+  shake() {
+    if (this.#mode === MODE.DEFAULT) {
+      this.#eventComponent?.shake();
+    } else if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.shake();
     }
   }
 
@@ -181,31 +208,5 @@ export default class EventPresenter {
       JSON.stringify(oldEvent.offers) !== JSON.stringify(updatedEvent.offers);
 
     return isMajorChange ? UpdateType.MAJOR : UpdateType.MINOR;
-  }
-
-  setSaving() {
-    if (this.#eventEditComponent && this.#eventEditComponent.element) {
-      this.#eventEditComponent.updateElement({ isSaving: true });
-    }
-  }
-
-  setDeleting() {
-    if (this.#eventEditComponent && this.#eventEditComponent.element) {
-      this.#eventEditComponent.updateElement({ isDeleting: true });
-    }
-  }
-
-  resetState() {
-    if (this.#eventEditComponent && this.#eventEditComponent.element) {
-      this.#eventEditComponent.updateElement({ isSaving: false, isDeleting: false });
-    }
-  }
-
-  shake() {
-    if (this.#mode === MODE.DEFAULT) {
-      this.#eventComponent?.shake();
-    } else if (this.#eventEditComponent && this.#eventEditComponent.element) {
-      this.#eventEditComponent.shake();
-    }
   }
 }

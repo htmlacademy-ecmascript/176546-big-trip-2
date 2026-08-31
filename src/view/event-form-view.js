@@ -117,6 +117,7 @@ export default class EventFormView extends AbstractStatefulView {
   #isNew = false;
   #saveButton = null;
   #isShaking = false;
+  #lastValidPrice = 0;
 
   constructor({ event, offers, destinations, onSubmit, onClick, onDeleteClick, onCancel, isNew = false }) {
     super();
@@ -137,6 +138,7 @@ export default class EventFormView extends AbstractStatefulView {
     this.#handlerDeleteClick = onDeleteClick;
     this.#handlerCancelClick = onCancel;
     this.#isNew = isNew;
+    this.#lastValidPrice = state.basePrice !== undefined && state.basePrice !== null ? state.basePrice : 0;
 
     this._restoreHandlers();
   }
@@ -168,6 +170,8 @@ export default class EventFormView extends AbstractStatefulView {
     this.updateElement(
       EventFormView.parseEventToState(event),
     );
+    this.#lastValidPrice = event.basePrice !== undefined && event.basePrice !== null ? event.basePrice : 0;
+    this.#validatePrice();
   }
 
   shake() {
@@ -213,7 +217,8 @@ export default class EventFormView extends AbstractStatefulView {
     const priceInput = this.element.querySelector('.event__input--price');
     if (priceInput) {
       priceInput.addEventListener('input', this.#priceInputHandler);
-      priceInput.addEventListener('change', this.#priceChangeHandler);
+      priceInput.addEventListener('blur', this.#priceBlurHandler);
+      priceInput.addEventListener('keydown', this.#priceKeydownHandler);
     }
 
     const resetBtn = this.element.querySelector('.event__reset-btn');
@@ -228,12 +233,21 @@ export default class EventFormView extends AbstractStatefulView {
     this.#saveButton = this.element.querySelector('.event__save-btn');
 
     this.#setDatePickers();
+
+    setTimeout(() => {
+      this.#validatePrice();
+    }, 0);
   }
 
   #formSaveHandler = (evt) => {
     evt.preventDefault();
 
-    if (!this.#validateDates() || this._state.isSaving) {
+    if (!this.#validatePrice()) {
+      this.shake();
+      return;
+    }
+
+    if (this._state.isSaving) {
       return;
     }
 
@@ -285,8 +299,6 @@ export default class EventFormView extends AbstractStatefulView {
     if (this.#datePickerEnd && userDate) {
       this.#datePickerEnd.set('minDate', userDate);
     }
-
-    this.#validateDates();
   };
 
   #dateToChangeHandler = ([userDate]) => {
@@ -297,8 +309,6 @@ export default class EventFormView extends AbstractStatefulView {
     if (this.#datePickerStart && userDate) {
       this.#datePickerStart.set('maxDate', userDate);
     }
-
-    this.#validateDates();
   };
 
   #destinationChangeHandler = (evt) => {
@@ -317,37 +327,65 @@ export default class EventFormView extends AbstractStatefulView {
 
   #priceInputHandler = (evt) => {
     const value = evt.target.value;
-    const cleanedValue = value.replace(/[^0-9.,]/g, '');
+    const cleanedValue = value.replace(/[^0-9]/g, '');
 
     if (value !== cleanedValue) {
       evt.target.value = cleanedValue;
     }
+
+    if (cleanedValue) {
+      const newPrice = parseInt(cleanedValue, 10);
+      if (!isNaN(newPrice) && newPrice >= 0) {
+        this.#lastValidPrice = newPrice;
+        this._setState({
+          basePrice: newPrice,
+        });
+        this.#validatePrice();
+      }
+    } else {
+      this._setState({
+        basePrice: null,
+      });
+      this.#validatePrice();
+    }
   };
 
-  #priceChangeHandler = (evt) => {
-    const rawValue = evt.target.value.replace(/,/g, '.');
-    const cleanValue = rawValue.replace(/[^0-9.]/g, '');
+  #priceBlurHandler = (evt) => {
+    const value = evt.target.value.trim();
 
-    if (!cleanValue) {
-      evt.target.value = 0;
+    if (!value) {
+      evt.target.value = this.#lastValidPrice;
       this._setState({
-        basePrice: 0,
+        basePrice: this.#lastValidPrice,
       });
+      this.#validatePrice();
       return;
     }
 
-    const newPrice = parseFloat(cleanValue);
+    const newPrice = parseInt(value, 10);
 
     if (!isNaN(newPrice) && newPrice >= 0) {
+      this.#lastValidPrice = newPrice;
       evt.target.value = newPrice;
       this._setState({
         basePrice: newPrice,
       });
     } else {
-      evt.target.value = 0;
+      evt.target.value = this.#lastValidPrice;
       this._setState({
-        basePrice: 0,
+        basePrice: this.#lastValidPrice,
       });
+    }
+    this.#validatePrice();
+  };
+
+  #priceKeydownHandler = (evt) => {
+    const key = evt.key;
+    const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
+
+    if (!allowedKeys.includes(key) && !evt.ctrlKey && !evt.metaKey) {
+      evt.preventDefault();
+      this.shake();
     }
   };
 
@@ -369,30 +407,33 @@ export default class EventFormView extends AbstractStatefulView {
     });
   };
 
-  #validateDates() {
-    const dateFrom = this._state.dateFrom;
-    const dateTo = this._state.dateTo;
+  #validatePrice() {
+    const basePrice = this._state.basePrice;
 
-    if (!dateFrom || !dateTo) {
-      this.#saveButton.disabled = true;
+    if (basePrice === null || basePrice === undefined || !Number.isInteger(basePrice) || basePrice < 0) {
+      if (this.#saveButton) {
+        this.#saveButton.disabled = true;
+      }
       return false;
     }
 
-    const fromDate = new Date(dateFrom);
-    const toDate = new Date(dateTo);
-
-    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-      this.#saveButton.disabled = true;
-      return false;
+    if (this.#saveButton) {
+      this.#saveButton.disabled = false;
     }
-
-    if (fromDate > toDate) {
-      this.#saveButton.disabled = true;
-      return false;
-    }
-
-    this.#saveButton.disabled = false;
     return true;
+  }
+
+  #createDatePicker(inputElement, defaultDate, onChange, config = {}) {
+    return flatpickr(
+      inputElement,
+      {
+        dateFormat: DATE_FORMAT,
+        defaultDate: defaultDate,
+        onChange: onChange,
+        enableTime: true,
+        ...config
+      }
+    );
   }
 
   #setDatePickers() {
@@ -400,36 +441,32 @@ export default class EventFormView extends AbstractStatefulView {
     const endInput = this.element.querySelector('#event-end-time-1');
 
     if (startInput) {
-      this.#datePickerStart = flatpickr(
+      this.#datePickerStart = this.#createDatePicker(
         startInput,
+        this._state.dateFrom,
+        this.#dateFromChangeHandler,
         {
-          dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler,
-          enableTime: true,
           onOpen: () => {
             if (this._state.dateTo) {
               this.#datePickerStart.set('maxDate', new Date(this._state.dateTo));
             }
           }
-        },
+        }
       );
     }
 
     if (endInput) {
-      this.#datePickerEnd = flatpickr(
+      this.#datePickerEnd = this.#createDatePicker(
         endInput,
+        this._state.dateTo,
+        this.#dateToChangeHandler,
         {
-          dateFormat: DATE_FORMAT,
-          defaultDate: this._state.dateTo,
-          onChange: this.#dateToChangeHandler,
-          enableTime: true,
           onOpen: () => {
             if (this._state.dateFrom) {
               this.#datePickerEnd.set('minDate', new Date(this._state.dateFrom));
             }
           }
-        },
+        }
       );
     }
 
@@ -440,8 +477,6 @@ export default class EventFormView extends AbstractStatefulView {
     if (this._state.dateTo && this.#datePickerStart) {
       this.#datePickerStart.set('maxDate', new Date(this._state.dateTo));
     }
-
-    this.#validateDates();
   }
 
   static parseEventToState(event) {

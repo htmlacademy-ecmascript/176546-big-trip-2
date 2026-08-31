@@ -69,6 +69,14 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
+  destroy() {
+    if (this.#newEventButtonView) {
+      remove(this.#newEventButtonView);
+      this.#newEventButtonView = null;
+    }
+    this.#clearEventList();
+  }
+
   #renderMessage(type, filterType) {
     this.#messageComponent = new MessageView({ type, filterType });
     render(this.#messageComponent, this.#boardContainer);
@@ -358,20 +366,12 @@ export default class BoardPresenter {
 
   #getSortedEvents(sortType) {
     const sortFunctions = {
-      [SortType.price]: sortEventprice,
+      [SortType.PRICE]: sortEventprice,
       [SortType.TIME]: sortEventTime,
       [SortType.DAY]: sortEventDay,
     };
 
     const sortFunction = sortFunctions[sortType] || sortEventDay;
     return [...this.events].sort(sortFunction);
-  }
-
-  destroy() {
-    if (this.#newEventButtonView) {
-      remove(this.#newEventButtonView);
-      this.#newEventButtonView = null;
-    }
-    this.#clearEventList();
   }
 }
