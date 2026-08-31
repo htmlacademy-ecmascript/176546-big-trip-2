@@ -1,14 +1,19 @@
 import { render, remove, RenderPosition } from '../framework/render.js';
 import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
-import ListEmptyView from '../view/list-empty-view.js';
-import LoadingView from '../view/loading-view.js';
+import MessageView from '../view/message-view.js';
 import EventPresenter from './event-presenter.js';
 import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
 import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
 import { filter } from '../util/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -22,12 +27,14 @@ export default class BoardPresenter {
   #eventPresenter = new Map();
   #currentSortType = SortType.DAY;
   #filterModel = null;
-  #emptyComponent = null;
-  #loadingComponent = null;
+  #messageComponent = null;
   #newEventPresenter = null;
   #newEventButtonView = null;
   #buttonContainer = null;
   #isLoading = true;
+  #uiBlocker = null;
+  #isError = false;
+  #skipNewEventRerender = false;
 
   constructor({
     boardContainer,
@@ -43,30 +50,34 @@ export default class BoardPresenter {
     this.#offersModel = offersModel;
     this.#filterModel = filterModel;
     this.#buttonContainer = buttonContainer;
+    this.#uiBlocker = new UiBlocker({
+      lowerLimit: TimeLimit.LOWER_LIMIT,
+      upperLimit: TimeLimit.UPPER_LIMIT,
+    });
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#offersModel.addObserver(this.#handleModelEvent);
   }
 
   init() {
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
     this.#isLoading = true;
+    this.#isError = false;
 
     this.#renderNewEventButton();
     this.#renderBoard();
   }
 
-  #renderLoading() {
-    this.#loadingComponent = new LoadingView();
-    render(this.#loadingComponent, this.#boardContainer);
+  #renderMessage(type, filterType) {
+    this.#messageComponent = new MessageView({ type, filterType });
+    render(this.#messageComponent, this.#boardContainer);
   }
 
-  #removeLoading() {
-    if (this.#loadingComponent) {
-      remove(this.#loadingComponent);
-      this.#loadingComponent = null;
+  #removeMessage() {
+    if (this.#messageComponent) {
+      remove(this.#messageComponent);
+      this.#messageComponent = null;
     }
   }
 
@@ -93,9 +104,9 @@ export default class BoardPresenter {
       return this.#eventListComponent.element;
     }
 
-    if (this.#emptyComponent) {
-      remove(this.#emptyComponent);
-      this.#emptyComponent = null;
+    if (this.#messageComponent) {
+      remove(this.#messageComponent);
+      this.#messageComponent = null;
     }
 
     this.#eventListComponent = new EventListView();
@@ -144,10 +155,23 @@ export default class BoardPresenter {
     if (this.#newEventButtonView) {
       this.#newEventButtonView.setDisabled(false);
     }
+
+    if (this.#skipNewEventRerender) {
+      this.#skipNewEventRerender = false;
+      return;
+    }
+
+    if (this.events.length === 0) {
+      this.#renderBoard();
+    }
   };
 
   #handleModeChange = () => {
+    this.#skipNewEventRerender = true;
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
+    if (this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+    }
   };
 
   get events() {
@@ -157,14 +181,31 @@ export default class BoardPresenter {
     return filter[filterType](events);
   }
 
-  #handleViewAction = async (actionType, updateType, update) => {
-    const actions = {
-      [UserAction.UPDATE_EVENT]: () => this.#eventsModel.updateEvent(update),
-      [UserAction.ADD_EVENT]: () => this.#eventsModel.addEvent(update),
-      [UserAction.DELETE_EVENT]: () => this.#eventsModel.deleteEvent(update.id),
-    };
+  #handleViewAction = async (actionType, updateType, update, presenter) => {
+    this.#uiBlocker.block();
 
-    await actions[actionType]?.();
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_EVENT:
+          presenter?.setSaving();
+          await this.#eventsModel.updateEvent(update);
+          break;
+        case UserAction.ADD_EVENT:
+          presenter?.setSaving();
+          await this.#eventsModel.addEvent(update);
+          break;
+        case UserAction.DELETE_EVENT:
+          presenter?.setDeleting();
+          await this.#eventsModel.deleteEvent(update.id);
+          break;
+      }
+    } catch (error) {
+      presenter?.shake();
+      setTimeout(() => presenter?.resetState(), 600);
+      throw error;
+    } finally {
+      this.#uiBlocker.unblock();
+    }
   };
 
   #handlePatchUpdate = (data) => {
@@ -180,11 +221,15 @@ export default class BoardPresenter {
   };
 
   #handleMinorUpdate = () => {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
     this.#currentSortType = SortType.DAY;
     this.#renderBoard();
   };
 
   #handleMajorUpdate = () => {
+    this.#offers = this.#offersModel.offers;
+    this.#destinations = this.#destinationModel.destinations;
     this.#currentSortType = SortType.DAY;
     this.#renderBoard();
   };
@@ -193,6 +238,12 @@ export default class BoardPresenter {
     this.#isLoading = false;
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationModel.destinations;
+    this.#renderBoard();
+  };
+
+  #handleInitError = () => {
+    this.#isLoading = false;
+    this.#isError = true;
     this.#renderBoard();
   };
 
@@ -209,6 +260,9 @@ export default class BoardPresenter {
         break;
       case UpdateType.INIT:
         this.#handleInitUpdate();
+        break;
+      case UpdateType.INIT_ERROR:
+        this.#handleInitError();
         break;
     }
   };
@@ -249,9 +303,6 @@ export default class BoardPresenter {
   }
 
   #renderEventList() {
-    this.#offers = this.#offersModel.offers;
-    this.#destinations = this.#destinationModel.destinations;
-
     const sortedEvents = this.#getSortedEvents(this.#currentSortType);
 
     sortedEvents.forEach((event) => {
@@ -278,41 +329,30 @@ export default class BoardPresenter {
       this.#eventListComponent = null;
     }
 
-    if (this.#emptyComponent) {
-      remove(this.#emptyComponent);
-      this.#emptyComponent = null;
-    }
-
-    if (this.#loadingComponent) {
-      remove(this.#loadingComponent);
-      this.#loadingComponent = null;
-    }
+    this.#removeMessage();
   }
 
   #renderBoard = () => {
-    this.#offers = this.#offersModel.offers;
-    this.#destinations = this.#destinationModel.destinations;
-
     this.#clearEventList();
 
-    if (this.#isLoading) {
-      this.#renderLoading();
+    if (this.#isError) {
+      this.#renderMessage('error');
       return;
     }
 
-    this.#removeLoading();
+    if (this.#isLoading) {
+      this.#renderMessage('loading');
+      return;
+    }
 
     if (this.events.length === 0) {
-      this.#emptyComponent = new ListEmptyView(this.#filterModel.filter);
-      render(this.#emptyComponent, this.#boardContainer);
+      this.#renderMessage('empty', this.#filterModel.filter);
       return;
     }
 
     this.#renderSort();
-
     this.#eventListComponent = new EventListView();
     render(this.#eventListComponent, this.#boardContainer);
-
     this.#renderEventList();
   };
 

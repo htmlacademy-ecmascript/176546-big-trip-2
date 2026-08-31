@@ -278,7 +278,7 @@ export default class EventFormView extends AbstractStatefulView {
   };
 
   #dateFromChangeHandler = ([userDate]) => {
-    this.updateElement({
+    this._setState({
       dateFrom: userDate,
     });
 
@@ -290,7 +290,7 @@ export default class EventFormView extends AbstractStatefulView {
   };
 
   #dateToChangeHandler = ([userDate]) => {
-    this.updateElement({
+    this._setState({
       dateTo: userDate,
     });
 
@@ -330,7 +330,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     if (!cleanValue) {
       evt.target.value = 0;
-      this.updateElement({
+      this._setState({
         basePrice: 0,
       });
       return;
@@ -340,12 +340,12 @@ export default class EventFormView extends AbstractStatefulView {
 
     if (!isNaN(newPrice) && newPrice >= 0) {
       evt.target.value = newPrice;
-      this.updateElement({
+      this._setState({
         basePrice: newPrice,
       });
     } else {
       evt.target.value = 0;
-      this.updateElement({
+      this._setState({
         basePrice: 0,
       });
     }
@@ -386,7 +386,7 @@ export default class EventFormView extends AbstractStatefulView {
       return false;
     }
 
-    if (fromDate >= toDate) {
+    if (fromDate > toDate) {
       this.#saveButton.disabled = true;
       return false;
     }

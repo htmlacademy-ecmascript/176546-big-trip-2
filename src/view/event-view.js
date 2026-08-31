@@ -107,4 +107,12 @@ export default class EventView extends AbstractView {
     evt.preventDefault();
     this.#handleFavoriteClick?.();
   };
+
+  shake() {
+    this.element.style.animation = 'shake 0.6s';
+
+    setTimeout(() => {
+      this.element.style.animation = '';
+    }, 600);
+  }
 }

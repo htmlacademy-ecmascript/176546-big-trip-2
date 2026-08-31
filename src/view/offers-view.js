@@ -2,8 +2,8 @@ import OfferView from './offer-view.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 function createOffersTemplate(event, allOffers) {
-  const safeOffers = Array.isArray(allOffers) ? allOffers : [];
-  const eventOffers = event.offers || [];
+  const safeOffers = allOffers;
+  const eventOffers = event.offers;
 
   if (eventOffers.length === 0) {
     return '';
@@ -48,7 +48,7 @@ export default class OffersView extends AbstractView {
   constructor({ event, offers }) {
     super();
     this.#event = event;
-    this.#offers = Array.isArray(offers) ? offers : [];
+    this.#offers = offers;
   }
 
   get template() {

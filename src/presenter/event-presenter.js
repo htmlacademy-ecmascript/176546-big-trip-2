@@ -2,16 +2,10 @@ import EventView from '../view/event-view.js';
 import {remove, render, replace} from '../framework/render.js';
 import EventFormView from '../view/event-form-view.js';
 import {UpdateType, UserAction} from '../const.js';
-import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const MODE = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
-};
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
 };
 
 export default class EventPresenter {
@@ -25,16 +19,11 @@ export default class EventPresenter {
   #handleDataChange = null;
   #handleModeChange = null;
   #mode = MODE.DEFAULT;
-  #uiBlocker = null;
 
   constructor({eventListContainer, onDataChange, onModeChange}) {
     this.#eventListContainer = eventListContainer;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
-    this.#uiBlocker = new UiBlocker({
-      lowerLimit: TimeLimit.LOWER_LIMIT,
-      upperLimit: TimeLimit.UPPER_LIMIT,
-    });
   }
 
   init({event, offers, destination, destinations}) {
@@ -106,39 +95,33 @@ export default class EventPresenter {
   }
 
   #handleFormSubmit = async (updatedEvent) => {
-    this.#uiBlocker.block();
+    const updateType = this.#getUpdateType(updatedEvent);
 
     try {
-      const updateType = this.#getUpdateType(updatedEvent);
       await this.#handleDataChange(
         UserAction.UPDATE_EVENT,
         updateType,
         updatedEvent,
+        this,
       );
       this.#replaceFormToEvent();
     } catch (error) {
-      this.#eventEditComponent?.updateElement({ isSaving: false, isDeleting: false });
-      this.#eventEditComponent?.shake();
-    } finally {
-      this.#uiBlocker.unblock();
+      // ФИКС: ошибка уже обработана в board (resetState + shake),
+      // не даём ей стать unhandled promise rejection; форма остаётся открытой
     }
   };
 
   #handleDeleteClick = async (event) => {
-    this.#uiBlocker.block();
-
     try {
       await this.#handleDataChange(
         UserAction.DELETE_EVENT,
         UpdateType.MAJOR,
         event,
+        this,
       );
       this.#replaceFormToEvent();
     } catch (error) {
-      this.#eventEditComponent?.updateElement({ isSaving: false, isDeleting: false });
-      this.#eventEditComponent?.shake();
-    } finally {
-      this.#uiBlocker.unblock();
+      // ФИКС: см. выше — ошибка обработана в board, форма остаётся открытой
     }
   };
 
@@ -174,12 +157,17 @@ export default class EventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFavoriteClick = () => {
-    this.#handleDataChange(
-      UserAction.UPDATE_EVENT,
-      UpdateType.PATCH,
-      {...this.#event, isFavorite: !this.#event.isFavorite},
-    );
+  #handleFavoriteClick = async () => {
+    try {
+      await this.#handleDataChange(
+        UserAction.UPDATE_EVENT,
+        UpdateType.PATCH,
+        {...this.#event, isFavorite: !this.#event.isFavorite},
+        this,
+      );
+    } catch (error) {
+      // ФИКС: ошибка обработана в board (resetState + shake), не пробрасываем
+    }
   };
 
   #getUpdateType(updatedEvent) {
@@ -193,5 +181,31 @@ export default class EventPresenter {
       JSON.stringify(oldEvent.offers) !== JSON.stringify(updatedEvent.offers);
 
     return isMajorChange ? UpdateType.MAJOR : UpdateType.MINOR;
+  }
+
+  setSaving() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isSaving: true });
+    }
+  }
+
+  setDeleting() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isDeleting: true });
+    }
+  }
+
+  resetState() {
+    if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.updateElement({ isSaving: false, isDeleting: false });
+    }
+  }
+
+  shake() {
+    if (this.#mode === MODE.DEFAULT) {
+      this.#eventComponent?.shake();
+    } else if (this.#eventEditComponent && this.#eventEditComponent.element) {
+      this.#eventEditComponent.shake();
+    }
   }
 }

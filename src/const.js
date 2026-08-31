@@ -34,6 +34,14 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  INIT_ERROR: 'INIT_ERROR',
+};
+
+const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export {
@@ -42,5 +50,6 @@ export {
   SortType,
   UserAction,
   UpdateType,
+  Method,
 };
 

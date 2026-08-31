@@ -1,11 +1,5 @@
 import ApiService from '../framework/api-service.js';
-
-const Method = {
-  GET: 'GET',
-  PUT: 'PUT',
-  POST: 'POST',
-  DELETE: 'DELETE',
-};
+import {Method} from '../const.js';
 
 export default class EventsApiService extends ApiService {
   get events() {
@@ -17,8 +11,8 @@ export default class EventsApiService extends ApiService {
     return {
       'id': event.id,
       'type': event.type,
-      'date_from': event.dateFrom instanceof Date ? event.dateFrom.toISOString() : event.dateFrom,
-      'date_to': event.dateTo instanceof Date ? event.dateTo.toISOString() : event.dateTo,
+      'date_from': event.dateFrom.toISOString(),
+      'date_to': event.dateTo.toISOString(),
       'destination': event.destination,
       'is_favorite': event.isFavorite || false,
       'base_price': event.basePrice,

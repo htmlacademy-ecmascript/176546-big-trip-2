@@ -35,13 +35,10 @@ export default class TripInfoView extends AbstractView {
       return 'No destinations';
     }
 
-    // ✅ Сортируем события по дате
     const sortedEvents = [...this.#events].sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
 
-    // ✅ Получаем ID назначений в правильном порядке
     const destinationIds = sortedEvents.map((event) => event.destination);
 
-    // ✅ Убираем дубликаты, сохраняя порядок
     const uniqueNames = [];
     const seen = new Set();
 
@@ -73,7 +70,8 @@ export default class TripInfoView extends AbstractView {
     }
 
     const dates = this.#events
-      .map((event) => event.dateFrom)
+      .map((event) => [event.dateFrom, event.dateTo])
+      .flat()
       .sort((a, b) => new Date(a) - new Date(b));
 
     const startDate = dayjs(dates[0]).format(dateFormat);
