@@ -42,6 +42,12 @@ export default class HeaderPresenter {
 
   #renderHeader() {
     const allEvents = this.#eventsModel.events;
+
+    if (!allEvents || allEvents.length === 0) {
+      this.#clearHeader();
+      return;
+    }
+
     const destinations = this.#destinations;
     const offers = this.#offers;
 
