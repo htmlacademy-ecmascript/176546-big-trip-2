@@ -102,17 +102,15 @@ export default class NewEventPresenter {
       return;
     }
 
-    try {
-      await this.#handleDataChange(
-        UserAction.ADD_EVENT,
-        UpdateType.MAJOR,
-        event,
-        this,
-      );
+    const added = await this.#handleDataChange(
+      UserAction.ADD_EVENT,
+      UpdateType.MAJOR,
+      event,
+      this,
+    );
+
+    if (added) {
       this.destroy();
-    } catch (error) {
-      // ФИКС: ошибка уже обработана в board (resetState + shake),
-      // не даём ей стать unhandled promise rejection; форма остаётся открытой
     }
   };
 

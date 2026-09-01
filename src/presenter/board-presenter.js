@@ -5,10 +5,10 @@ import MessageView from '../view/message-view.js';
 import EventPresenter from './event-presenter.js';
 import {FilterType, SortType, TimeLimit, UpdateType, UserAction} from '../const.js';
 import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
-import { filter } from '../util/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import {filter} from '../util/filter.js';
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -78,6 +78,7 @@ export default class BoardPresenter {
 
     return filter[filterType](events);
   }
+
 
   #renderMessage(type, filterType) {
     this.#messageComponent = new MessageView({ type, filterType });
@@ -202,10 +203,12 @@ export default class BoardPresenter {
           await this.#eventsModel.deleteEvent(update.id);
           break;
       }
+
+      return true;
     } catch (error) {
       presenter?.shake();
       setTimeout(() => presenter?.resetState(), 600);
-      throw error;
+      return false;
     } finally {
       this.#uiBlocker.unblock();
     }
