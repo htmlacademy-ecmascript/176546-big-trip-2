@@ -123,32 +123,28 @@ export default class EventPresenter {
 
   #handleFormSubmit = async (updatedEvent) => {
     const updateType = this.#getUpdateType(updatedEvent);
+    const saved = await this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      updateType,
+      updatedEvent,
+      this,
+    );
 
-    try {
-      await this.#handleDataChange(
-        UserAction.UPDATE_EVENT,
-        updateType,
-        updatedEvent,
-        this,
-      );
+    if (saved) {
       this.#replaceFormToEvent();
-    } catch (error) {
-      // ФИКС: ошибка уже обработана в board (resetState + shake),
-      // не даём ей стать unhandled promise rejection; форма остаётся открытой
     }
   };
 
   #handleDeleteClick = async (event) => {
-    try {
-      await this.#handleDataChange(
-        UserAction.DELETE_EVENT,
-        UpdateType.MAJOR,
-        event,
-        this,
-      );
+    const deleted = await this.#handleDataChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MAJOR,
+      event,
+      this,
+    );
+
+    if (deleted) {
       this.#replaceFormToEvent();
-    } catch (error) {
-      // ФИКС: см. выше — ошибка обработана в board, форма остаётся открытой
     }
   };
 
@@ -184,17 +180,13 @@ export default class EventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFavoriteClick = async () => {
-    try {
-      await this.#handleDataChange(
-        UserAction.UPDATE_EVENT,
-        UpdateType.PATCH,
-        {...this.#event, isFavorite: !this.#event.isFavorite},
-        this,
-      );
-    } catch (error) {
-      // ФИКС: ошибка обработана в board (resetState + shake), не пробрасываем
-    }
+  #handleFavoriteClick = () => {
+    this.#handleDataChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      {...this.#event, isFavorite: !this.#event.isFavorite},
+      this,
+    );
   };
 
   #getUpdateType(updatedEvent) {
