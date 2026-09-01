@@ -3,17 +3,12 @@ import SortView from '../view/sort-view.js';
 import EventListView from '../view/event-list-view.js';
 import MessageView from '../view/message-view.js';
 import EventPresenter from './event-presenter.js';
-import { FilterType, SortType, UpdateType, UserAction } from '../const.js';
+import {FilterType, SortType, TimeLimit, UpdateType, UserAction} from '../const.js';
 import { sortEventDay, sortEventprice, sortEventTime } from '../util/sort.js';
 import { filter } from '../util/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import NewEventButtonView from '../view/new-event-button-view.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
-
-const TimeLimit = {
-  LOWER_LIMIT: 350,
-  UPPER_LIMIT: 1000,
-};
 
 export default class BoardPresenter {
   #eventListComponent = null;
@@ -75,6 +70,13 @@ export default class BoardPresenter {
       this.#newEventButtonView = null;
     }
     this.#clearEventList();
+  }
+
+  get events() {
+    const filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+
+    return filter[filterType](events);
   }
 
   #renderMessage(type, filterType) {
@@ -181,13 +183,6 @@ export default class BoardPresenter {
       this.#newEventPresenter.destroy();
     }
   };
-
-  get events() {
-    const filterType = this.#filterModel.filter;
-    const events = this.#eventsModel.events;
-
-    return filter[filterType](events);
-  }
 
   #handleViewAction = async (actionType, updateType, update, presenter) => {
     this.#uiBlocker.block();

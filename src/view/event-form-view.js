@@ -410,7 +410,7 @@ export default class EventFormView extends AbstractStatefulView {
   #validatePrice() {
     const basePrice = this._state.basePrice;
 
-    if (basePrice === null || basePrice === undefined || !Number.isInteger(basePrice) || basePrice < 0) {
+    if (basePrice === null || basePrice === undefined || !Number.isInteger(basePrice) || basePrice <= 0) {
       if (this.#saveButton) {
         this.#saveButton.disabled = true;
       }

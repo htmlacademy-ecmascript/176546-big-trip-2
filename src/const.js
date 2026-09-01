@@ -44,6 +44,11 @@ const Method = {
   DELETE: 'DELETE',
 };
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export {
   TYPES,
   FilterType,
@@ -51,5 +56,6 @@ export {
   UserAction,
   UpdateType,
   Method,
+  TimeLimit,
 };
 
